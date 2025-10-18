@@ -293,15 +293,14 @@
                 <h1 class="text-4xl font-bold text-gray-900">I.L.M.I. Academy Portal</h1>
                 <p class="text-gray-500 mt-2 text-lg">Unified Results & Attendance System</p>
             </div>
-            <div id="auth-form" class="space-y-4 pt-4">
-                <input id="auth-email" type="email" placeholder="Enter your email" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-gray-800 outline-none transition">
-                <input id="auth-password" type="password" placeholder="Enter your password" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-gray-800 outline-none transition">
-                <p id="auth-status" class="text-red-500 text-sm h-5"></p>
-                <div class="flex gap-4">
-                    <button onclick="signInWithEmail()" class="btn btn-primary text-lg w-full">🔑 Login</button>
-                    <button onclick="signUpWithEmail()" class="btn btn-secondary text-lg w-full">✨ Create Account</button>
-                </div>
-            </div>
+			<div id="auth-form" class="space-y-4 pt-4">
+				<input id="auth-email" type="email" placeholder="Enter your email" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-gray-800 outline-none transition">
+				<input id="auth-password" type="password" placeholder="Enter your password" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-gray-800 outline-none transition">
+				<p id="auth-status" class="text-red-500 text-sm h-5"></p>
+				<div class="flex gap-4">
+					<button onclick="signInWithEmail()" class="btn btn-primary text-lg w-full">🔑 Login</button>
+				</div>
+			</div>
             <div id="user-profile" class="hidden items-center justify-center flex-col space-y-4 pt-4">
                 <p id="user-name" class="font-semibold text-gray-700 text-xl"></p>
                 <button id="proceed-btn" onclick="navigateTo('page-2-main-dashboard')" class="btn btn-success text-lg py-3 w-full" disabled>🚀 Proceed to Portal</button>
@@ -1123,42 +1122,52 @@
     <!-- ===================================================================== -->
     <!-- ================= NEW: ORGANIZATION MANAGEMENT ====================== -->
     <!-- ===================================================================== -->
-    <div id="page-organization-management" class="page p-4 md:p-6">
-        <main class="w-full max-w-5xl mx-auto card p-8 md:p-10">
-            <div id="org-management-content" class="hidden">
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
-                    <h1 class="text-3xl font-bold text-gray-900">🏫 Organization Management</h1>
-                    <button onclick="navigateTo('page-2-main-dashboard')" class="btn btn-secondary">⬅️ Back to Portal</button>
-                </div>
-                <div class="input-group">
-                    <label for="org-user-search">🔍 Search by Email</label>
-                    <input type="text" id="org-user-search" onkeyup="orgMgmt_filterUsers()" placeholder="Enter user email to filter..." class="w-full md:w-1/2 p-3 border rounded-lg">
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left text-gray-600">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-                            <tr>
-                                <th class="px-4 py-3">S.No</th>
-                                <th class="px-4 py-3">Email</th>
-                                <th class="px-4 py-3">Role</th>
-                                <th class="px-4 py-3">Joined On</th>
-                                <th class="px-4 py-3 text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="org-management-table-body">
-                            <!-- User rows will be injected here by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div id="org-management-restricted" class="hidden text-center p-8">
-                 <p class="text-5xl mb-4">🚫</p>
-                <h2 class="text-2xl font-bold text-red-700">Access Restricted</h2>
-                <p class="text-gray-600 mt-2">This page is only accessible to the organization's administrator.</p>
-                <button onclick="navigateTo('page-2-main-dashboard')" class="btn btn-secondary mt-8">⬅️ Back to Portal</button>
-            </div>
-        </main>
-    </div>
+	<div id="page-organization-management" class="page p-4 md:p-6">
+		<main class="w-full max-w-5xl mx-auto card p-8 md:p-10">
+			<div id="org-management-content" class="hidden">
+				<div class="flex flex-wrap justify-between items-center gap-4 mb-8">
+					<h1 class="text-3xl font-bold text-gray-900">🏫 Organization Management</h1>
+					<button onclick="navigateTo('page-2-main-dashboard')" class="btn btn-secondary">⬅️ Back to Portal</button>
+				</div>
+				
+				<div class="p-6 border rounded-lg bg-indigo-50 mb-8">
+					<h3 class="text-xl font-bold text-indigo-800 mb-4">👤 Create New User Account (Admin Only)</h3>
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+						<input id="new-user-email" type="email" placeholder="Enter new user's email" class="w-full p-3 border rounded-lg">
+						<input id="new-user-password" type="text" placeholder="Set temporary password" class="w-full p-3 border rounded-lg">
+						<button onclick="orgMgmt_createAccount()" class="btn btn-ai w-full h-full">✨ Create Account</button>
+					</div>
+					<p id="new-user-status" class="text-sm text-red-600 mt-2 h-4"></p>
+				</div>
+
+				<div class="input-group">
+					<label for="org-user-search">🔍 Search by Email</label>
+					<input type="text" id="org-user-search" onkeyup="orgMgmt_filterUsers()" placeholder="Enter user email to filter..." class="w-full md:w-1/2 p-3 border rounded-lg">
+				</div>
+				<div class="overflow-x-auto">
+					<table class="w-full text-sm text-left text-gray-600">
+						<thead class="text-xs text-gray-700 uppercase bg-gray-100">
+							<tr>
+								<th class="px-4 py-3">S.No</th>
+								<th class="px-4 py-3">Email</th>
+								<th class="px-4 py-3">Role</th>
+								<th class="px-4 py-3">Joined On</th>
+								<th class="px-4 py-3 text-center">Actions</th>
+							</tr>
+						</thead>
+						<tbody id="org-management-table-body">
+							</tbody>
+					</table>
+				</div>
+			</div>
+			<div id="org-management-restricted" class="hidden text-center p-8">
+				<p class="text-5xl mb-4">🚫</p>
+				<h2 class="text-2xl font-bold text-red-700">Access Restricted</h2>
+				<p class="text-gray-600 mt-2">This page is only accessible to the organization's administrator.</p>
+				<button onclick="navigateTo('page-2-main-dashboard')" class="btn btn-secondary mt-8">⬅️ Back to Portal</button>
+			</div>
+		</main>
+	</div>
 	
 	<!-- ===================================================================== -->
 <!-- ======================= TEST GENERATOR PAGES ======================== -->
@@ -1521,30 +1530,70 @@
         }
     };
 
-    window.signUpWithEmail = async () => {
-        const email = document.getElementById('auth-email').value;
-        const password = document.getElementById('auth-password').value;
-        if (!email || !password) return authStatus.textContent = "Email and password are required.";
-        if (password.length < 6) return authStatus.textContent = "Password must be at least 6 characters.";
-        authStatus.textContent = "Creating account...";
-        const { data, error } = await supabase.auth.signUp({ email, password });
-        if (error) {
-            authStatus.textContent = error.message;
-        } else {
-            // NEW: Add new user to user_roles table on signup
-            const { error: roleError } = await supabase.from('user_roles').insert({
-                user_id: data.user.id,
-                email: email,
-                role: 'viewer' // Default role
-            });
-            if (roleError) {
-                authStatus.textContent = "Signup succeeded, but failed to set role.";
-            } else {
-                authStatus.textContent = "Success! Check your email for verification.";
-                showToast("Account created!");
-            }
-        }
-    };
+	/**
+	 * Admin-only function to create a new user account and set their role.
+	 */
+	window.orgMgmt_createAccount = async () => {
+		const email = document.getElementById('new-user-email').value;
+		const password = document.getElementById('new-user-password').value;
+		const statusEl = document.getElementById('new-user-status');
+
+		if (!email || !password) {
+			statusEl.textContent = "Email and temporary password are required.";
+			return;
+		}
+		if (password.length < 6) {
+			statusEl.textContent = "Password must be at least 6 characters.";
+			return;
+		}
+
+		statusEl.textContent = "Creating user...";
+		statusEl.style.color = '#3b82f6'; // Blue for info
+
+	    // 1. Create a dedicated Admin Client using the Service Role Key (Secret Key)
+		// ⚠️ CRITICAL: Replace 'YOUR_SUPABASE_SERVICE_ROLE_KEY_HERE' with your actual Service Role Key from your Supabase Project Settings > API.
+		const ADMIN_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4dmtmaGR5dWp6dHFtdnRpZWVoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDMzNTY4NCwiZXhwIjoyMDc1OTExNjg0fQ.CBwKOtUJTWXuBwsmXnnnDuFDN9RBri-_6pt7FWDBgrs";
+		
+		// Temporarily create a new client instance for the admin action
+		const adminSupabase = window.supabase.createClient(SUPABASE_URL, ADMIN_KEY, {
+			auth: {
+				// Tell the client to bypass the usual session handling
+				persistSession: false,
+				autoRefreshToken: false,
+			}
+		});
+
+		// Execute the Admin API function with the secret key client
+		const { data, error: authError } = await adminSupabase.auth.admin.createUser({
+			email: email,
+			password: password,
+			email_confirm: true, // Auto-confirm email for admin-created accounts
+		});
+
+		if (authError) {
+			statusEl.textContent = `Error creating user: ${authError.message}`;
+			statusEl.style.color = '#be123c'; // Red for error
+			return;
+		}
+
+		// 2. Set the default role (Editor is a safe default)
+		const { error: roleError } = await supabase.from('user_roles').insert({
+			user_id: data.user.id,
+			email: email,
+			role: 'editor' 
+		});
+
+		if (roleError) {
+			statusEl.textContent = "User created, but failed to set default role. Check user_roles table manually.";
+			statusEl.style.color = '#f59e0b'; // Yellow for warning
+		} else {
+			statusEl.textContent = `✅ User ${email} created with 'editor' role.`;
+			statusEl.style.color = '#059669'; // Green for success
+			document.getElementById('new-user-email').value = '';
+			document.getElementById('new-user-password').value = '';
+			orgMgmt_initializePage(); // Refresh the user list
+		}
+	};
 
     window.signOutUser = async () => {
         await supabase.auth.signOut();
