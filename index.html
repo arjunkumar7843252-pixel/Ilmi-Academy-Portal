@@ -1621,16 +1621,30 @@
             // Apply UI restrictions AFTER role has been determined
             applyRoleBasedUI();
 
-        } else {
-            currentUser = null;
-            currentUserRole = 'viewer'; // Default for logged-out state
-            if (document.getElementById('auth-form')) {
-                authForm.classList.remove('hidden');
-                userProfile.classList.add('hidden');
-            }
-            navigateTo('page-1-login');
         }
-    };
+     		// 🛑 NEW CRITICAL BLOCK: FORCE ENABLE LOGIN FIELDS IF LOGGED OUT (User is NOT defined)
+			if (!user) {
+				const emailInput = document.getElementById('auth-email');
+				const passwordInput = document.getElementById('auth-password');
+				const loginBtn = document.querySelector('#auth-form button[onclick="signInWithEmail()"]');
+				const signupBtn = document.querySelector('#auth-form button[onclick="signUpWithEmail()"]');
+
+				if (emailInput) emailInput.disabled = false;
+				if (passwordInput) passwordInput.disabled = false;
+				if (loginBtn) { loginBtn.disabled = false; loginBtn.style.opacity = '1'; loginBtn.style.cursor = 'pointer'; }
+				if (signupBtn) { signupBtn.disabled = false; signupBtn.style.opacity = '1'; signupBtn.style.cursor = 'pointer'; }
+			}
+			// 🛑 END OF NEW CRITICAL BLOCK
+
+		else { // The original 'else' block remains
+			currentUser = null;
+			currentUserRole = 'viewer'; // Default for logged-out state
+			if (document.getElementById('auth-form')) {
+				authForm.classList.remove('hidden');
+				userProfile.classList.add('hidden');
+			}
+			navigateTo('page-1-login');
+		}
 
     window.copyFeedbackLink = () => {
         // Selects the input field containing the hardcoded link.
