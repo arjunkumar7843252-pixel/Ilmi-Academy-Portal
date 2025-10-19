@@ -1619,31 +1619,30 @@
             // Apply UI restrictions AFTER role has been determined
             applyRoleBasedUI();
 
-        }
-        // 🛑 NEW CRITICAL BLOCK: FORCE ENABLE LOGIN FIELDS IF LOGGED OUT
-        if (!user) {
-            const emailInput = document.getElementById('auth-email');
-            const passwordInput = document.getElementById('auth-password');
-            const loginBtn = document.querySelector('#auth-form button[onclick="signInWithEmail()"]');
-            const signupBtn = document.querySelector('#auth-form button[onclick="signUpWithEmail()"]');
+			// REPLACEMENT CODE BLOCK (Includes the UI fix and is syntactically sound)
+			} else { // Logged out state logic
+				currentUser = null;
+				currentUserRole = 'viewer'; // Default for logged-out state
 
-            if (emailInput) emailInput.disabled = false;
-            if (passwordInput) passwordInput.disabled = false;
-            if (loginBtn) { loginBtn.disabled = false; loginBtn.style.opacity = '1'; loginBtn.style.cursor = 'pointer'; }
-            if (signupBtn) { signupBtn.disabled = false; signupBtn.style.opacity = '1'; signupBtn.style.cursor = 'pointer'; }
-        }
-        // 🛑 END OF NEW CRITICAL BLOCK
+				// --- UI Overrides (Enabled regardless of RBAC default) ---
+				const emailInput = document.getElementById('auth-email');
+				const passwordInput = document.getElementById('auth-password');
+				const loginBtn = document.querySelector('#auth-form button[onclick="signInWithEmail()"]');
+				const signupBtn = document.querySelector('#auth-form button[onclick="signUpWithEmail()"]');
 
-        else {
-            currentUser = null;
-            currentUserRole = 'viewer'; // Default for logged-out state
-            if (document.getElementById('auth-form')) {
-                authForm.classList.remove('hidden');
-                userProfile.classList.add('hidden');
-            }
-            navigateTo('page-1-login');
-        }
-    };
+				if (emailInput) emailInput.disabled = false;
+				if (passwordInput) passwordInput.disabled = false;
+				if (loginBtn) { loginBtn.disabled = false; loginBtn.style.opacity = '1'; loginBtn.style.cursor = 'pointer'; }
+				if (signupBtn) { signupBtn.disabled = false; signupBtn.style.opacity = '1'; signupBtn.style.cursor = 'pointer'; }
+
+				// --- Navigation/Visibility Logic ---
+				if (document.getElementById('auth-form')) {
+					authForm.classList.remove('hidden');
+					userProfile.classList.add('hidden');
+				}
+				navigateTo('page-1-login');
+			}
+	    }; // <-- This closes the entire updateAuthUI function
 
     window.copyFeedbackLink = () => {
         // Selects the input field containing the hardcoded link.
