@@ -402,6 +402,11 @@
                     <h3 class="text-2xl font-bold text-teal-800 mt-2">Student Sheets</h3>
                     <p class="text-teal-600">Download branded student lists for any class.</p>
                 </button>
+				<button onclick="navigateTo('page-student-management')" class="action-card bg-orange-50 hover:bg-orange-100">
+					<p class="text-4xl">📚</p>
+					<h3 class="text-xl font-bold text-orange-800 mt-2">Student Management</h3>
+					<p class="text-sm text-orange-600">View, edit, and delete all student records.</p>
+				</button>
                 <button onclick="navigateTo('page-data-settings')" class="action-card bg-yellow-50 hover:bg-yellow-100">
                     <p class="text-4xl">⚙️</p>
                     <h3 class="text-2xl font-bold text-yellow-800 mt-2">App Data & Settings</h3>
@@ -879,6 +884,51 @@
             </div>
         </main>
     </div>
+
+	<div id="page-student-management" class="page p-4 md:p-8">
+		<main class="w-full max-w-7xl mx-auto card p-6 md:p-8">
+			<div class="flex flex-wrap justify-between items-center gap-4 mb-6 no-print">
+				<div>
+					<h1 class="text-3xl font-bold text-gray-900">📚 Student Master Management</h1>
+					<p class="text-gray-600">Complete list of all registered students with inline editing.</p>
+				</div>
+				<button onclick="navigateTo('page-2-main-dashboard')" class="btn btn-secondary">⬅️ Back to Portal</button>
+			</div>
+
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 border-b pb-4">
+				<div class="input-group !mb-0">
+					<label for="mgmt-class-filter">Filter by Class</label>
+					<select id="mgmt-class-filter" onchange="filterStudentsList()" class="w-full p-3 border rounded-lg"></select>
+				</div>
+				<div class="input-group !mb-0">
+					<label for="mgmt-search-filter">Search by Name/Roll No.</label>
+					<input type="text" id="mgmt-search-filter" onkeyup="filterStudentsList()" placeholder="Start typing name or roll number..." class="w-full p-3 border rounded-lg">
+				</div>
+				<div class="flex items-end">
+					<button onclick="saveAllStudentChanges()" class="btn btn-success w-full h-12" id="save-student-changes-btn">💾 Save All Changes</button>
+				</div>
+			</div>
+
+			<div class="overflow-x-auto max-h-[70vh] overflow-y-auto">
+				<table class="w-full text-sm text-left text-gray-600 border border-gray-300">
+					<thead class="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0">
+						<tr>
+							<th class="px-4 py-3 w-10">Sr.</th>
+							<th class="px-4 py-3 w-16">Roll No.</th>
+							<th class="px-4 py-3 w-1/5">Name</th>
+							<th class="px-4 py-3 w-1/5">Father Name</th>
+							<th class="px-4 py-3 w-1/5">Class / Program</th>
+							<th class="px-4 py-3 w-16">Contact</th>
+							<th class="px-4 py-3 w-20 text-center">Actions</th>
+						</tr>
+					</thead>
+					<tbody id="student-management-table-body">
+						<tr><td colspan="7" class="text-center p-4">Loading student data...</td></tr>
+					</tbody>
+				</table>
+			</div>
+		</main>
+	</div>
 
     <div id="page-analytics-dashboard" class="page p-4 md:p-6">
         <main class="w-full analytics-container">
@@ -1359,30 +1409,29 @@
 		<main class="w-full max-w-2xl mx-auto card p-8">
 			<h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">🧑‍💼 Manage Faculty Permissions</h1>
 
-			<div class="border p-4 mb-6 rounded-lg bg-gray-50">
-				<h2 class="text-xl font-bold mb-4 text-gray-700">Add New Faculty Member:</h2>
-				<div class="input-group">
-					<label for="new-teacher-name">Teacher's Full Name</label>
-					<input type="text" id="new-teacher-name" placeholder="Enter teacher's full name">
-				</div>
-
-				<h3 class="text-md font-semibold text-gray-600 mt-4 mb-2">Hierarchies (Select to Assign):</h3>
-
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<div class="input-group !mb-0">
-						<label class="block font-medium text-gray-700">✅ Assigned Classes</label>
-						<div id="new-teacher-classes-container" class="bg-white border rounded-lg p-2 h-32 overflow-y-auto space-y-1">
-							</div>
-					</div>
-					<div class="input-group !mb-0">
-						<label class="block font-medium text-gray-700">📝 Assigned Subjects</label>
-						<div id="new-teacher-subjects-container" class="bg-white border rounded-lg p-2 h-32 overflow-y-auto space-y-1">
-							</div>
-					</div>
-				</div>
-
-				<button onclick="addTeacherWithHierarchy()" class="btn btn-primary w-full mt-6">➕ Add Teacher & Save Permissions</button>
+		<div class="border p-4 mb-6 rounded-lg bg-gray-50">
+			<h2 class="text-xl font-bold mb-4 text-gray-700">Add New Faculty Member:</h2>
+			<div class="input-group">
+				<label for="new-teacher-name">Teacher's Full Name</label>
+				<input type="text" id="new-teacher-name" placeholder="Enter teacher's full name">
 			</div>
+
+			<h3 class="text-md font-semibold text-gray-600 mt-4 mb-2">Hierarchies (Select to Assign):</h3>
+
+			<div class="input-group">
+				<label class="block font-medium text-gray-700">✅ Step 1: Select Classes Taught</label>
+				<div id="new-teacher-classes-container" class="bg-white border rounded-lg p-2 h-32 overflow-y-auto space-y-1">
+				</div>
+			</div>
+			
+			<div id="new-teacher-class-subjects-wrapper" class="mt-6 border-t pt-4">
+				<h3 class="text-md font-semibold text-gray-600 mb-3">📝 Step 2: Assign Subjects per Class (Check a class above first)</h3>
+				<div id="dynamic-subject-containers" class="space-y-4">
+					<p class="text-sm text-gray-500 text-center p-4">Select classes above to see subject assignments here.</p>
+				</div>
+			</div>
+			<button onclick="addTeacherWithHierarchy()" class="btn btn-primary w-full mt-6">➕ Add Teacher & Save Permissions</button>
+		</div>
 
 			<h2 class="text-xl font-semibold text-gray-700 mb-4">Existing Faculty List:</h2>
 
@@ -1497,6 +1546,8 @@
     let localStudentsCache = [];
     let currentUserRole = 'viewer'; // NEW: State for user role
     let allUsersCache = []; // NEW: Cache for org management users
+	let allStudentsCache = []; // Keep one good definition
+    let filteredStudents = []; // Keep one good definition
 
 	// New helper function to calculate the starting date (Monday) of the current week
 	const getWeekStartDate = () => {
@@ -1774,21 +1825,26 @@
         currentPageId = pageId;
         window.scrollTo(0, 0);
 
-        // 3. Run initializations based on the new page ID.
-        if (pageId === 'page-data-settings' && currentUser) { updateStorageInfo(); }
-        if (pageId === 'page-results-class-select') { populateClassSelect('manual-entry-class-select', false); }
-        if (pageId === 'page-results-class-select-batch') { populateClassSelect('batch-entry-class-select', true); }
-        if (pageId === 'page-results-batch-report-generator') { initializeBatchReportGenerator(); }
-        if (pageId === 'page-analytics-dashboard') { initializeAnalyticsDashboard(); }
-        if (pageId === 'page-feedback-system') { initializeFeedbackSystem(); }
-        if (pageId === 'page-student-registration') { initializeStudentRegistration(); }
-        if (pageId === 'page-organization-management') { orgMgmt_initializePage(); }
-        if (pageId === 'page-teacher-log-entry' || pageId === 'page-teacher-faculty-management' || pageId === 'page-teacher-dashboard' || pageId === 'modal-log-filter' || pageId === 'modal-assign-hierarchy') {
-            initializeTeacherDashboard();
-        }
+	    // 3. Run initializations based on the new page ID.
+		if (pageId === 'page-data-settings' && currentUser) { updateStorageInfo(); }
+		if (pageId === 'page-results-class-select') { populateClassSelect('manual-entry-class-select', false); }
+		if (pageId === 'page-results-class-select-batch') { populateClassSelect('batch-entry-class-select', true); }
+		if (pageId === 'page-results-batch-report-generator') { initializeBatchReportGenerator(); }
+		if (pageId === 'page-analytics-dashboard') { initializeAnalyticsDashboard(); }
+		if (pageId === 'page-feedback-system') { initializeFeedbackSystem(); }
+		if (pageId === 'page-student-registration') { initializeStudentRegistration(); }
+		if (pageId === 'page-organization-management') { orgMgmt_initializePage(); }
+		
+		// 👇 INSERT THIS NEW LINE 👇
+		if (pageId === 'page-student-management') { initializeStudentManagement(); } 
+		// 👆 END OF INSERT 👆
+		
+		if (pageId === 'page-teacher-log-entry' || pageId === 'page-teacher-faculty-management' || pageId === 'page-teacher-dashboard' || pageId === 'modal-log-filter' || pageId === 'modal-assign-hierarchy') {
+			initializeTeacherDashboard();
+		}
 
-        applyRoleBasedUI();
-    };
+		applyRoleBasedUI();
+	};
 
     // --- HELPER & UTILITY FUNCTIONS ---
     window.showToast = (message, type = 'success') => {
@@ -3588,6 +3644,245 @@ window.addAttendanceToPreview = async () => {
         }
     };
 
+	// 1. Initialization and Data Fetch
+	window.initializeStudentManagement = async () => {
+		if (!currentUser) {
+			return showToast("Please log in to manage students.", "error");
+		}
+		showToast("Fetching all student records...", 'info');
+		
+		// Fetch ALL students for the current user
+		const { data, error } = await supabase.from('students')
+			.select('*')
+			.eq('user_id', currentUser.id)
+			.order('class_name')
+			.order('roll_no');
+
+		if (error) {
+			console.error("Error fetching all students:", error);
+			return showToast("Failed to load student data.", "error");
+		}
+
+		allStudentsCache = data || [];
+		filteredStudents = [...allStudentsCache];
+		
+		populateClassFilter();
+		renderStudentsList(filteredStudents);
+		showToast(`Loaded ${allStudentsCache.length} students.`, 'success');
+		
+		// --- 1. Fetch User Emails (For Audit Log Display) ---
+		// Fetch all user emails to map UUIDs to human-readable names/emails
+		// This is run only for Admin/Editor roles as they manage other users/audit logs
+		if (currentUserRole === 'admin' || currentUserRole === 'editor') {
+			const { data: userData } = await supabase.from('user_roles').select('user_id, email');
+			if (userData) {
+				userEmailMap = new Map(userData.map(u => [u.user_id, u.email]));
+			}
+		}	
+	};
+
+	// Helper function to populate the class dropdown filter
+	const populateClassFilter = () => {
+		const filterSelect = document.getElementById('mgmt-class-filter');
+		const uniqueClasses = ['All', ...new Set(allStudentsCache.map(s => s.class_name))].sort();
+		
+		filterSelect.innerHTML = uniqueClasses.map(c => 
+			`<option value="${c}">${c}</option>`
+		).join('');
+	};
+
+	// 2. Rendering the Table
+	const renderStudentsList = (students) => {
+		const tableBody = document.getElementById('student-management-table-body');
+		if (students.length === 0) {
+			tableBody.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-gray-500">No students match the current filter.</td></tr>`;
+			return;
+		}
+
+		tableBody.innerHTML = students.map((student, index) => {
+			const uniqueId = `student-${student.roll_no}-${student.class_name.replace(/ /g, '')}`;
+			const programDisplay = student.class_type && student.subgroup 
+				? `${student.class_type} (${student.subgroup})` 
+				: 'N/A';
+			
+			return `
+				<tr id="${uniqueId}" data-id="${student.id}" data-roll="${student.roll_no}" data-class="${student.class_name}" class="border-b hover:bg-gray-50">
+					<td class="px-4 py-2 text-center">${index + 1}</td>
+					<td class="px-4 py-2"><input type="text" class="w-full p-1 border rounded-md roll-input" value="${student.roll_no}" data-original="${student.roll_no}"></td>
+					<td class="px-4 py-2"><input type="text" class="w-full p-1 border rounded-md name-input" value="${student.name}" data-original="${student.name}"></td>
+					<td class="px-4 py-2"><input type="text" class="w-full p-1 border rounded-md fname-input" value="${student.fname}" data-original="${student.fname}"></td>
+					
+					<td class="px-4 py-2">
+						<div class="text-xs font-semibold">${student.class_name}</div>
+						<div class="text-xs text-gray-500">${programDisplay}</div>
+					</td>
+					
+					<td class="px-4 py-2"><input type="text" class="w-full p-1 border rounded-md contact-input" value="${student.contact || ''}" data-original="${student.contact || ''}"></td>
+					
+					<td class="px-4 py-2 text-center">
+						<button onclick="deleteStudent(${student.id}, '${student.name}')" class="btn btn-danger !p-1 text-xs">🗑️ Delete</button>
+					</td>
+				</tr>
+			`;
+		}).join('');
+	};
+
+	// 3. Filtering Logic
+	window.filterStudentsList = () => {
+		const classFilter = document.getElementById('mgmt-class-filter').value;
+		const searchFilter = document.getElementById('mgmt-search-filter').value.toLowerCase();
+		
+		filteredStudents = allStudentsCache.filter(student => {
+			const classMatch = classFilter === 'All' || student.class_name === classFilter;
+			
+			const searchMatch = !searchFilter || 
+				student.name.toLowerCase().includes(searchFilter) ||
+				student.roll_no.toString().includes(searchFilter);
+				
+			return classMatch && searchMatch;
+		});
+
+		renderStudentsList(filteredStudents);
+	};
+
+	// 4. CRUD Logic
+	window.deleteStudent = async (studentId, studentName) => {
+		if (!confirm(`Are you sure you want to permanently delete ${studentName}? This cannot be undone.`)) return;
+		
+		showToast(`Deleting ${studentName}...`, 'danger');
+		
+		// RLS must allow DELETE based on user_id
+		const { error } = await supabase.from('students').delete().eq('id', studentId);
+		
+		if (error) {
+			console.error("Delete error:", error);
+			return showToast("Failed to delete student. Check RLS policy.", 'error');
+		}
+		
+		showToast(`${studentName} deleted successfully.`, 'success');
+		
+		// Remove from cache and re-render
+		allStudentsCache = allStudentsCache.filter(s => s.id !== studentId);
+		filterStudentsList(); 
+	};
+
+	window.saveAllStudentChanges = async () => {
+		if (!currentUser || !currentUser.id) {
+			showToast("Error: You must be logged in to save student data.", 'error');
+			return; 
+		}
+
+		showToast("Collecting changes...", 'info');
+		
+		const changes = [];
+		let processingError = false;
+
+		document.querySelectorAll('#student-management-table-body tr').forEach(row => {
+			if (processingError) return;
+			
+			const studentId = row.dataset.id; 
+			const originalStudent = allStudentsCache.find(s => s.id.toString() === studentId);
+			
+			if (!originalStudent) return;
+
+			let hasChanged = false;
+			
+			// **1. MANDATORY FIELDS (Must be included for the update to work):**
+			const updatedData = { 
+				id: originalStudent.id, 
+				user_id: currentUser.id,
+				// 🛑 FIX: Must include the original required values 🛑
+				class_name: originalStudent.class_name,
+				class_type: originalStudent.class_type, // Assuming required
+				subgroup: originalStudent.subgroup      // Assuming required
+			}; 
+
+			// **2. EDITABLE FIELDS:**
+			
+			// Check Roll Number
+			const rollInput = row.querySelector('.roll-input');
+			if (rollInput.value !== originalStudent.roll_no.toString()) { 
+				const newRoll = rollInput.value; 
+				
+				if (!newRoll.trim() || isNaN(parseInt(newRoll)) || parseInt(newRoll) <= 0) {
+					showToast(`Invalid Roll Number for ${originalStudent.name}.`, 'error');
+					processingError = true;
+					return; 
+				}
+				updatedData.roll_no = newRoll; // Send as string or number, depending on DB type
+				hasChanged = true;
+			} else {
+				// If not changed, ensure the original is used (already in updatedData but good practice)
+				updatedData.roll_no = originalStudent.roll_no;
+			}
+
+			// Check Name
+			const nameInput = row.querySelector('.name-input');
+			if (nameInput.value.trim() !== originalStudent.name) {
+				updatedData.name = nameInput.value.trim();
+				hasChanged = true;
+			} else {
+				updatedData.name = originalStudent.name;
+			}
+
+			// Check Father Name
+			const fnameInput = row.querySelector('.fname-input');
+			if (fnameInput.value.trim() !== originalStudent.fname) {
+				updatedData.fname = fnameInput.value.trim();
+				hasChanged = true;
+			} else {
+				updatedData.fname = originalStudent.fname;
+			}
+			
+			// Check Contact
+			const contactInput = row.querySelector('.contact-input');
+			const contactValue = contactInput.value.trim() || null; 
+			
+			if (contactValue !== (originalStudent.contact || null)) { 
+				updatedData.contact = contactValue;
+				hasChanged = true;
+			} else {
+				// Keep original contact value (which can be null)
+				updatedData.contact = originalStudent.contact; 
+			}
+
+			// **3. Finalize and push to changes array**
+			if (hasChanged) {
+				changes.push(updatedData);
+			}
+		});
+
+		if (processingError || changes.length === 0) {
+			if (!processingError) showToast("No changes detected to save.", 'info');
+			return;
+		}
+
+		showToast(`Saving ${changes.length} updated records...`, 'primary');
+		
+		// Perform the upsert operation
+		const { error } = await supabase.from('students').upsert(changes, { onConflict: 'id' });
+
+		if (error) {
+			console.error("Save error:", error);
+			if (error.message.includes('duplicate key') || error.code === '23505') {
+				return showToast("Failed to save. Check Roll Number/Class uniqueness.", 'error');
+			}
+			return showToast("Failed to save changes. See console for details.", 'error');
+		}
+
+		showToast("All changes saved successfully!", 'success');
+		initializeStudentManagement();
+		
+		// **1. MANDATORY FIELDS (Must be included for the update to work):**
+		const updatedData = { 
+			id: originalStudent.id, 
+			user_id: currentUser.id,
+			class_name: originalStudent.class_name,
+			class_type: originalStudent.class_type,
+			subgroup: originalStudent.subgroup
+		};
+	};
+
     /**************************************************************************/
     /* ANALYTICS LOGIC                                                        */
     /**************************************************************************/
@@ -4473,49 +4768,136 @@ window.addAttendanceToPreview = async () => {
         };
     };
 
+	// NEW HELPER: Function to dynamically render subject lists for ADD NEW teacher
+	window.renderSubjectAssignmentFields = (assignedSubjectsMap = {}) => {
+		const classCheckboxes = document.querySelectorAll('#new-teacher-classes-container input[type="checkbox"]');
+		const dynamicContainer = document.getElementById('dynamic-subject-containers');
+		const allSubjects = getAllHierarchyOptions().subjects;
 
-    window.initializeTeacherDashboard = async () => {
-        // 1. Fetch and cache the faculty list (includes assigned_classes/subjects)
-        await fetchFacultyList();
+		let html = '';
+		let activeClasses = 0;
 
-        const selectEl = document.getElementById('log-teacher-select');
-        selectEl.innerHTML = facultyListCache.map(t => `<option value="${t.name}" data-id="${t.id}">${t.name}</option>`).join('') ||
-            '<option value="">-- No Teachers Added --</option>';
+		classCheckboxes.forEach(classCheckbox => {
+			const className = classCheckbox.value;
 
-        // Attach listener for dynamic filtering to the submission page dropdown
-        selectEl.onchange = applySubmissionFilter;
+			if (classCheckbox.checked) {
+				activeClasses++;
+				const currentAssignments = assignedSubjectsMap[className] || [];
+				
+				// Generate a dedicated box for this class's subjects
+				html += `
+					<div class="sub-block">
+						<h4 class="font-bold text-gray-700 mb-3 border-b pb-2">Subjects for ${className}</h4>
+						<div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1">
+							${allSubjects.map(subject => `
+								<label for="subject-new-${className}-${subject}" class="checkbox-item">
+									<input type="checkbox" 
+										   id="subject-new-${className}-${subject}" 
+										   data-class="${className}" 
+										   value="${subject}"
+										   ${currentAssignments.includes(subject) ? 'checked' : ''}>
+									<span class="text-sm">${subject}</span>
+								</label>
+							`).join('')}
+						</div>
+					</div>
+				`;
+			}
+		});
 
-        if (currentPageId === 'page-teacher-faculty-management') {
-            renderFacultyListUI();
+		if (activeClasses === 0) {
+			dynamicContainer.innerHTML = '<p class="text-sm text-gray-500 text-center p-4">Select classes above to see subject assignments here.</p>';
+		} else {
+			dynamicContainer.innerHTML = html;
+		}
+	}
 
-            // --- NEW/REPLACED: Render Checkboxes for the Add New form ---
-            const hierarchyOptions = getAllHierarchyOptions();
 
-            const classContainer = document.getElementById('new-teacher-classes-container');
-            const subjectContainer = document.getElementById('new-teacher-subjects-container');
+	// NEW HELPER: For rendering subjects in the EDIT MODAL
+	window.renderEditSubjectAssignmentFields = (teacherId, initialAssignmentsMap = {}) => {
+		let assignedSubjectsMap = initialAssignmentsMap;
+		
+		// If not called with a map (i.e., called via onchange), get data from cache
+		if (Object.keys(assignedSubjectsMap).length === 0) {
+			const teacher = facultyListCache.find(t => t.id === teacherId);
+			if (teacher) assignedSubjectsMap = teacher.assigned_subjects || {};
+		}
 
-            // Render Assigned Classes as styled checkboxes
-            classContainer.innerHTML = hierarchyOptions.classes.map(c => `
+		const classCheckboxes = document.querySelectorAll('#edit-teacher-classes-container input[type="checkbox"]');
+		const dynamicContainer = document.getElementById('edit-dynamic-subject-containers');
+		const allSubjects = getAllHierarchyOptions().subjects;
+
+		let html = '';
+		let activeClasses = 0;
+
+		classCheckboxes.forEach(classCheckbox => {
+			const className = classCheckbox.value;
+
+			if (classCheckbox.checked) {
+				activeClasses++;
+				const currentAssignments = assignedSubjectsMap[className] || [];
+				
+				html += `
+					<div class="sub-block">
+						<h4 class="font-bold text-gray-700 mb-3 border-b pb-2">Subjects for ${className}</h4>
+						<div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1">
+							${allSubjects.map(subject => `
+								<label for="edit-subject-${className}-${subject}" class="checkbox-item">
+									<input type="checkbox" 
+										   id="edit-subject-${className}-${subject}" 
+										   data-class="${className}" 
+										   value="${subject}"
+										   ${currentAssignments.includes(subject) ? 'checked' : ''}>
+									<span class="text-sm">${subject}</span>
+								</label>
+							`).join('')}
+						</div>
+					</div>
+				`;
+			}
+		});
+
+		if (activeClasses === 0) {
+			dynamicContainer.innerHTML = '<p class="text-sm text-gray-500 text-center p-4">Select classes above to see subject assignments here.</p>';
+		} else {
+			dynamicContainer.innerHTML = html;
+		}
+	}
+
+	window.initializeTeacherDashboard = async () => {
+		// 1. Fetch and cache the faculty list 
+		await fetchFacultyList();
+
+		const selectEl = document.getElementById('log-teacher-select');
+		selectEl.innerHTML = facultyListCache.map(t => `<option value="${t.name}" data-id="${t.id}">${t.name}</option>`).join('') ||
+			'<option value="">-- No Teachers Added --</option>';
+
+		selectEl.onchange = applySubmissionFilter;
+
+		if (currentPageId === 'page-teacher-faculty-management') {
+			renderFacultyListUI();
+
+			const hierarchyOptions = getAllHierarchyOptions();
+
+			const classContainer = document.getElementById('new-teacher-classes-container');
+			
+			// Render Assigned Classes with the crucial onchange handler
+			classContainer.innerHTML = hierarchyOptions.classes.map(c => `
 				<label for="class-new-${c}" class="checkbox-item">
-					<input type="checkbox" id="class-new-${c}" value="${c}">
+					<input type="checkbox" id="class-new-${c}" value="${c}" onchange="renderSubjectAssignmentFields()">
 					<span class="text-sm">${c}</span>
 				</label>
 			`).join('');
+			
+			// Initial render of the dynamic subject area (shows placeholder initially)
+			renderSubjectAssignmentFields();
 
-            // Render Assigned Subjects as styled checkboxes
-            subjectContainer.innerHTML = hierarchyOptions.subjects.map(s => `
-				<label for="subject-new-${s}" class="checkbox-item">
-					<input type="checkbox" id="subject-new-${s}" value="${s}">
-					<span class="text-sm">${s}</span>
-				</label>
-			`).join('');
-            // --------------------------------------------------------
 
-        } else if (currentPageId === 'page-teacher-log-entry') {
-            renderWeeklyLogBody();
-            applySubmissionFilter(); // Apply filters based on the selected teacher
-        }
-    };
+		} else if (currentPageId === 'page-teacher-log-entry') {
+			renderWeeklyLogBody();
+			applySubmissionFilter(); // Apply filters based on the selected teacher
+		}
+	};
 
     // --- FIND THE EXISTING 'window.fetchFacultyList' FUNCTION AND REPLACE IT WITH THIS DEBUG VERSION ---
 
@@ -4552,50 +4934,67 @@ window.addAttendanceToPreview = async () => {
 
     // --- Faculty Management ---
 
-    window.addTeacherWithHierarchy = async () => {
-        const name = document.getElementById('new-teacher-name').value.trim();
+	window.addTeacherWithHierarchy = async () => {
+		const name = document.getElementById('new-teacher-name').value.trim();
 
-        // --- NEW: Read checked values from the containers ---
-        const getCheckedValues = (containerId) => {
-            return Array.from(document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`)).map(cb => cb.value);
-        };
+		// 1. Collect the Class-Specific Subject Map
+		const assignedSubjectsMap = {};
+		const classCheckboxes = document.querySelectorAll('#new-teacher-classes-container input[type="checkbox"]:checked');
+		
+		// Check if any classes were selected
+		if (classCheckboxes.length === 0) {
+			return showToast("Please select at least one class taught.", "error");
+		}
 
-        const assignedClasses = getCheckedValues('new-teacher-classes-container');
-        const assignedSubjects = getCheckedValues('new-teacher-subjects-container');
-        // ---------------------------------------------------
+		let totalSubjectsAssigned = 0;
+		
+		// Iterate over selected classes and collect their associated subjects
+		classCheckboxes.forEach(classCheckbox => {
+			const className = classCheckbox.value;
+			const selectedSubjects = Array.from(
+				document.querySelectorAll(`#dynamic-subject-containers input[data-class="${className}"]:checked`)
+			).map(cb => cb.value);
 
-        if (!name) return showToast("Please enter a teacher's name.", "error");
-        if (assignedClasses.length === 0 || assignedSubjects.length === 0) {
-            return showToast("Please assign at least one class and one subject.", "warning");
-        }
+			if (selectedSubjects.length > 0) {
+				assignedSubjectsMap[className] = selectedSubjects;
+				totalSubjectsAssigned += selectedSubjects.length;
+			}
+		});
+		
+		// 2. Validate Assignment
+		if (totalSubjectsAssigned === 0) {
+			return showToast("Please assign at least one subject to a selected class.", "error");
+		}
+		
+		if (!name) return showToast("Please enter a teacher's name.", "error");
 
-        const exists = facultyListCache.some(t => t.name === name);
-        if (exists) return showToast("Teacher already exists.", "info");
+		const exists = facultyListCache.some(t => t.name === name);
+		if (exists) return showToast("Teacher already exists.", "info");
 
-        showToast("Adding teacher and saving hierarchy...", 'info');
+		showToast("Adding teacher and saving hierarchy...", 'info');
 
-        // INSERT with all assigned arrays
-        const { error } = await supabase.from('teachers').insert({
-            name: name,
-            user_id: currentUser.id,
-            assigned_classes: assignedClasses,
-            assigned_subjects: assignedSubjects
-        });
+		// 3. INSERT the new, structured data
+		const { error } = await supabase.from('teachers').insert({
+			name: name,
+			user_id: currentUser.id,
+			assigned_classes: Object.keys(assignedSubjectsMap), // Class list (used for filters)
+			assigned_subjects: assignedSubjectsMap // JSONB Map (the actual assignments)
+		});
 
-        if (error) {
-            console.error("DB Error on Add Teacher:", error);
-            return showToast("Failed to add teacher. (Check RLS INSERT policy on 'teachers' table)", "error");
-        }
+		if (error) {
+			console.error("DB Error on Add Teacher:", error);
+			return showToast("Failed to add teacher. (Check RLS and DB column types)", "error");
+		}
 
-        // Clear and refresh UI on success
-        document.getElementById('new-teacher-name').value = '';
-        document.querySelectorAll('#new-teacher-classes-container input[type="checkbox"]').forEach(cb => cb.checked = false);
-        document.querySelectorAll('#new-teacher-subjects-container input[type="checkbox"]').forEach(cb => cb.checked = false);
+		// 4. Clear and refresh UI on success
+		document.getElementById('new-teacher-name').value = '';
+		document.querySelectorAll('#new-teacher-classes-container input[type="checkbox"]').forEach(cb => cb.checked = false);
+		renderSubjectAssignmentFields(); // Clears the dynamic subject area
 
-        await fetchFacultyList();
-        renderFacultyListUI();
-        showToast(`${name} added with hierarchy successfully!`, "success");
-    };
+		await fetchFacultyList();
+		renderFacultyListUI();
+		showToast(`${name} added with class-specific hierarchy successfully!`, "success");
+	};
 
     window.deleteTeacher = async (id, name) => {
         if (!confirm(`Are you sure you want to delete ${name}? This will not delete saved teaching logs.`)) return;
@@ -4610,17 +5009,23 @@ window.addAttendanceToPreview = async () => {
         showToast(`${name} deleted.`, "success");
     };
 
-    window.renderFacultyListUI = () => {
-        const container = document.getElementById('faculty-list-container');
-        container.innerHTML = facultyListCache.map(t => {
-            const classCount = t.assigned_classes ? t.assigned_classes.length : 0;
-            const subjectCount = t.assigned_subjects ? t.assigned_subjects.length : 0;
+	window.renderFacultyListUI = () => {
+		const container = document.getElementById('faculty-list-container');
+		container.innerHTML = facultyListCache.map(t => {
+			const assignedClassesArray = t.assigned_classes || [];
+			const assignedSubjectsMap = t.assigned_subjects || {};
+			
+			let subjectCount = 0;
+			// Count all subjects across all assigned classes
+			Object.values(assignedSubjectsMap).forEach(subjects => {
+				subjectCount += subjects.length;
+			});
 
-            return `
+			return `
 				<div class="flex justify-between items-center p-3 bg-white border rounded-md">
 					<span class="font-bold text-gray-800">${t.name}</span>
 					<div class="text-right text-sm text-gray-600">
-						Classes: ${classCount} | Subjects: ${subjectCount}
+						Classes: ${assignedClassesArray.length} | Total Subjects: ${subjectCount}
 					</div>
 					<button onclick="openAssignHierarchyModal(${t.id})" class="btn btn-secondary !p-2 text-xs">
 						📐 Edit
@@ -4628,39 +5033,64 @@ window.addAttendanceToPreview = async () => {
 					<button onclick="deleteTeacher(${t.id}, '${t.name}')" class="btn btn-danger !p-2 text-xs">🗑️</button>
 				</div>
 			`;
-        }).join('') || '<p class="text-center text-gray-500 p-4">No faculty members found.</p>';
-    };
+		}).join('') || '<p class="text-center text-gray-500 p-4">No faculty members found.</p>';
+	};
 
     // --- Hierarchy Assignment Modal (for editing existing teachers) ---
 
-    window.openAssignHierarchyModal = (teacherId) => {
-        currentEditingTeacherId = teacherId;
-        const teacher = facultyListCache.find(t => t.id === teacherId);
-        if (!teacher) return;
+	window.openAssignHierarchyModal = (teacherId) => {
+		currentEditingTeacherId = teacherId;
+		const teacher = facultyListCache.find(t => t.id === teacherId);
+		if (!teacher) return;
 
-        const modal = document.getElementById('modal-assign-hierarchy');
-        document.getElementById('assign-hierarchy-title').textContent = `Permissions for ${teacher.name}`;
+		const modal = document.getElementById('modal-assign-hierarchy');
+		const hierarchyOptions = getAllHierarchyOptions();
+		// Use the map/object from the teacher record
+		const assignedSubjectsMap = teacher.assigned_subjects || {}; 
 
-        const classSelect = document.getElementById('assign-class-select');
-        const subjectSelect = document.getElementById('assign-subject-select');
+		// 1. Prepare Classes Checkboxes with change listener, pre-checked based on assigned_classes
+		const classesHtml = hierarchyOptions.classes.map(c =>
+			`
+			<label for="edit-class-${c}" class="checkbox-item">
+				<input type="checkbox" 
+					   id="edit-class-${c}" 
+					   value="${c}" 
+					   onchange="renderEditSubjectAssignmentFields(${teacherId})" 
+					   ${teacher.assigned_classes?.includes(c) ? 'checked' : ''}>
+				<span class="text-sm">${c}</span>
+			</label>
+			`
+		).join('');
 
-        const hierarchyOptions = getAllHierarchyOptions();
+		// 2. Inject this new dynamic structure into the modal
+		modal.querySelector('.card').innerHTML = `
+			<h1 id="assign-hierarchy-title" class="text-2xl font-bold text-gray-900 mb-6">Permissions for ${teacher.name}</h1>
+			<p class="text-gray-600 mb-4">Select the specific classes and subjects this teacher is responsible for.</p>
 
-        // 1. Populate Classes (Multi-Select)
-        const assignedClasses = teacher.assigned_classes || [];
-        classSelect.innerHTML = hierarchyOptions.classes.map(c =>
-            `<option value="${c}" ${assignedClasses.includes(c) ? 'selected' : ''}>${c}</option>`
-        ).join('');
+			<div class="input-group">
+				<label class="block font-medium text-gray-700">✅ Step 1: Classes Taught</label>
+				<div id="edit-teacher-classes-container" class="bg-white border rounded-lg p-2 h-32 overflow-y-auto space-y-1">
+					${classesHtml}
+				</div>
+			</div>
 
-        // 2. Populate Subjects (Multi-Select)
-        const assignedSubjects = teacher.assigned_subjects || [];
-        subjectSelect.innerHTML = hierarchyOptions.subjects.map(s =>
-            `<option value="${s}" ${assignedSubjects.includes(s) ? 'selected' : ''}>${s}</option>`
-        ).join('');
+			<div id="edit-class-subjects-wrapper" class="mt-6 border-t pt-4">
+				<h3 class="text-md font-semibold text-gray-600 mb-3">📝 Step 2: Assign Subjects per Class</h3>
+				<div id="edit-dynamic-subject-containers" class="space-y-4">
+					</div>
+			</div>
 
-        // Use navigateTo for modals
-        window.navigateTo('modal-assign-hierarchy');
-    };
+			<div class="mt-8 flex justify-end gap-4">
+				<button onclick="closeAssignHierarchyModal()" class="btn btn-secondary">Cancel</button>
+				<button onclick="saveTeacherHierarchy()" class="btn btn-success">💾 Save Permissions</button>
+			</div>
+		`;
+
+		// 3. Initial subject rendering for the edit view, passing the current assignments
+		renderEditSubjectAssignmentFields(teacherId, assignedSubjectsMap);
+
+		window.navigateTo('modal-assign-hierarchy');
+	};
 
 
     window.closeAssignHierarchyModal = () => {
@@ -4669,31 +5099,48 @@ window.addAttendanceToPreview = async () => {
         currentEditingTeacherId = null;
     };
 
-    window.saveTeacherHierarchy = async () => {
-        if (currentEditingTeacherId === null) return showToast("Error: Cannot save, no teacher selected.", "error");
+	window.saveTeacherHierarchy = async () => {
+		if (currentEditingTeacherId === null) return showToast("Error: Cannot save, no teacher selected.", "error");
 
-        const classSelect = document.getElementById('assign-class-select');
-        const subjectSelect = document.getElementById('assign-subject-select');
+		const assignedSubjectsMap = {};
+		const classCheckboxes = document.querySelectorAll('#edit-teacher-classes-container input[type="checkbox"]:checked');
+		
+		// 1. Collect the new class-to-subject mapping from the edit modal
+		classCheckboxes.forEach(classCheckbox => {
+			const className = classCheckbox.value;
+			const selectedSubjects = Array.from(
+				document.querySelectorAll(`#edit-dynamic-subject-containers input[data-class="${className}"]:checked`)
+			).map(cb => cb.value);
 
-        const selectedClasses = Array.from(classSelect.selectedOptions).map(option => option.value);
-        const selectedSubjects = Array.from(subjectSelect.selectedOptions).map(option => option.value);
+			if (selectedSubjects.length > 0) {
+				assignedSubjectsMap[className] = selectedSubjects;
+			}
+		});
+		
+		// 2. Prepare the payload (class list from map keys)
+		const selectedClasses = Object.keys(assignedSubjectsMap);
+		
+		if (selectedClasses.length === 0) {
+			 if (!confirm("No classes or subjects are assigned. Proceed to remove all permissions?")) return;
+		}
 
-        showToast("Saving permissions...", 'info');
+		showToast("Saving permissions...", 'info');
 
-        const { error } = await supabase.from('teachers')
-            .update({ assigned_classes: selectedClasses, assigned_subjects: selectedSubjects })
-            .eq('id', currentEditingTeacherId);
+		// 3. Perform the update with the new structure
+		const { error } = await supabase.from('teachers')
+			.update({ assigned_classes: selectedClasses, assigned_subjects: assignedSubjectsMap })
+			.eq('id', currentEditingTeacherId);
 
-        if (error) {
-            console.error("Hierarchy save error:", error);
-            return showToast("Failed to save permissions. (Check RLS UPDATE policy on 'teachers')", "error");
-        } else {
-            showToast("Permissions saved successfully!", "success");
-            closeAssignHierarchyModal();
-            await fetchFacultyList();
-            renderFacultyListUI();
-        }
-    };
+		if (error) {
+			console.error("Hierarchy save error:", error);
+			return showToast("Failed to save permissions. (Check RLS and DB column types)", "error");
+		} else {
+			showToast("Permissions saved successfully!", "success");
+			closeAssignHierarchyModal();
+			await fetchFacultyList();
+			renderFacultyListUI();
+		}
+	};
 
     // --- Log Submission ---
 
@@ -5053,4 +5500,5 @@ window.addAttendanceToPreview = async () => {
 </script>
 </body>
 </html>
+
 
