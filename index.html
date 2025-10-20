@@ -385,11 +385,14 @@
                     <h3 class="text-xl font-bold text-pink-800 mt-2">Feedback System</h3>
                     <p class="text-sm text-pink-600">Manage and generate feedback forms.</p>
                 </button>
-                 <button onclick="window.navigateTo('page-testgen-menu')" class="action-card bg-purple-50 hover:bg-purple-100">
-                    <p class="text-4xl">📝</p>
-                <h3 class="text-xl font-bold text-purple-800 mt-2">Test Generator</h3>
-                <p class="text-sm text-purple-600">Create and print branded test papers.</p>
-                </button>
+                 <button onclick="window.navigateTo('page-teacher-feedback')" class="action-card bg-purple-50 hover:bg-purple-100 relative">
+				    <p class="text-4xl">🗣️</p>
+					<h3 class="text-xl font-bold text-purple-800 mt-2">Teacher Suggestions</h3>
+					<p class="text-sm text-purple-600">Submit and review anonymous feedback.</p>
+					<span id="feedback-notification-badge" class="absolute top-2 right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full hidden">
+						0
+					</span>
+				</button>
             </div>
              <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
                 <button onclick="navigateTo('page-teacher-dashboard')" class="action-card bg-orange-50 hover:bg-orange-100">
@@ -406,6 +409,11 @@
 					<p class="text-4xl">📚</p>
 					<h3 class="text-xl font-bold text-orange-800 mt-2">Student Management</h3>
 					<p class="text-sm text-orange-600">View, edit, and delete all student records.</p>
+				</button>
+				<button onclick="navigateTo('page-student-term-report')" class="action-card bg-fuchsia-50 hover:bg-fuchsia-100">
+					<p class="text-4xl">📈</p>
+					<h3 class="text-xl font-bold text-fuchsia-800 mt-2">Student Term Growth</h3>
+					<p class="text-sm text-fuchsia-600">Compare individual student performance over terms.</p>
 				</button>
                 <button onclick="navigateTo('page-data-settings')" class="action-card bg-yellow-50 hover:bg-yellow-100">
                     <p class="text-4xl">⚙️</p>
@@ -666,6 +674,70 @@
             </div>
         </main>
     </div>
+
+	<div id="page-student-term-report" class="page p-4 md:p-6">
+		<main class="w-full analytics-container">
+			<div class="card p-6 no-print mb-6">
+				<div class="flex flex-wrap justify-between items-center gap-4">
+					<div>
+						<h1 class="text-3xl font-bold text-gray-900">📈 Student Term Comparison Report</h1>
+						<p class="text-gray-600">Track an individual student's growth across multiple academic terms.</p>
+					</div>
+					<button onclick="navigateTo('page-2-main-dashboard')" class="btn btn-secondary">⬅️ Back to Portal</button>
+				</div>
+				
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6 border-t pt-6 items-end">
+					<div class="input-group !mb-0">
+						<label for="term-report-class-select">🎓 Select Class</label>
+						<select id="term-report-class-select" onchange="termReport_populateStreamSelect(this.value)"></select>
+					</div>
+					<div class="input-group !mb-0">
+						<label for="term-report-stream-select">🧮 Select Stream/Group</label>
+						<select id="term-report-stream-select" onchange="termReport_populateStudentAndTerm()"></select>
+					</div>
+					<div class="input-group !mb-0">
+						<label for="term-report-student-select">🧑‍🎓 Select Student</label>
+						<select id="term-report-student-select" disabled></select>
+					</div>
+					<div class="input-group !mb-0">
+						<label for="term-report-term-select">🗓️ Select Terms (Multi-Select)</label>
+						<div id="term-report-term-select" 
+							 class="w-full p-2 border rounded-lg h-32 overflow-y-auto bg-white space-y-1" 
+							 disabled>
+							 </div>
+					</div>
+				</div>
+				<div class="flex justify-end mt-4">
+					 <button onclick="runTermComparisonReport()" class="btn btn-primary w-full md:w-auto">🚀 Generate Comparison Report</button>
+				</div>
+			</div>
+
+			<div id="term-report-content" class="space-y-8 printable-area bg-white p-8 rounded-lg shadow-xl hidden">
+				<h2 id="term-report-title" class="text-2xl font-bold text-gray-800 text-center"></h2>
+				
+				<div class="chart-card">
+					<h3 class="text-xl font-bold text-gray-800 mb-4">Overall Performance Trend (Total %)</h3>
+					<canvas id="term-report-overall-chart"></canvas>
+				</div>
+				
+				<div class="chart-card">
+					<h3 class="text-xl font-bold text-gray-800 mb-4">Subject-Wise Growth Comparison</h3>
+					<div id="term-report-subject-charts" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						</div>
+				</div>
+				
+				 <div class="text-center no-print mt-8">
+					 <button onclick="triggerPrint('page-student-term-report', true)" class="btn btn-success">🖨️ Print Report</button>
+				 </div>
+			</div>
+
+			<div id="term-report-no-data" class="text-center py-16">
+				 <p class="text-5xl mb-4">⚠️</p>
+				 <h2 class="text-2xl font-bold text-gray-700">Select Options Above</h2>
+				 <p class="text-gray-500 mt-2">Choose a student and multiple terms to view the comparison.</p>
+			</div>
+		</main>
+	</div>
 
     <div id="page-attendance-students" class="page items-center py-8 px-4">
         <main class="w-full max-w-4xl mx-auto card p-8 md:p-12">
@@ -1106,6 +1178,54 @@
 		</main>
 	</div>
 
+	<div id="page-teacher-feedback" class="page p-4 md:p-6">
+		<main class="w-full max-w-4xl mx-auto card p-8">
+			<div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+				<h1 class="text-3xl font-bold text-gray-900">🗣️ Anonymous Suggestion Box</h1>
+				<button onclick="navigateTo('page-2-main-dashboard')" class="btn btn-secondary">⬅️ Back to Portal</button>
+			</div>
+
+			<div id="teacher-feedback-submission" class="p-6 border rounded-lg bg-indigo-50 mb-8">
+				<h2 class="text-xl font-bold text-indigo-800 mb-4">Submit a Suggestion/Concern</h2>
+				<p class="text-sm text-indigo-600 mb-4">Your submission will be **completely anonymous** to the administration.</p>
+				<div class="input-group">
+					<label for="suggestion-area">Your Anonymous Feedback</label>
+					<textarea id="suggestion-area" rows="4" placeholder="Enter your suggestion or concern here."></textarea>
+				</div>
+				<button onclick="submitAnonymousFeedback()" class="btn btn-primary w-full">🚀 Submit Suggestion</button>
+			</div>
+
+			<div id="teacher-feedback-admin-panel" class="p-6 border rounded-lg bg-white shadow-xl hidden">
+				<h2 class="text-2xl font-bold text-gray-800 mb-4">Admin Review Panel</h2>
+				<div class="flex justify-between items-center mb-4 border-b pb-4">
+					<h3 id="admin-panel-heading" class="font-semibold text-gray-600">Total New Suggestions: 0</h3>
+					<button onclick="loadTeacherFeedback()" class="btn btn-secondary !py-2 !px-4">🔄 Refresh List</button>
+				</div>
+				<div id="admin-feedback-list" class="space-y-4 max-h-[50vh] overflow-y-auto">
+					<p class="text-center text-gray-500 p-4">Loading suggestions...</p>
+				</div>
+			</div>
+		</main>
+	</div>
+
+	<div id="modal-admin-comment" class="page items-center justify-center modal-backdrop hidden z-40">
+		<div class="w-full max-w-lg card p-8 m-4">
+			<h1 class="text-2xl font-bold text-gray-900 mb-4">Review & Comment</h1>
+			<div class="bg-gray-50 p-4 rounded-lg border mb-4">
+				<h3 class="font-semibold text-gray-700">Suggestion:</h3>
+				<p id="modal-feedback-content" class="text-gray-600 whitespace-pre-wrap"></p>
+			</div>
+			<div class="input-group">
+				<label for="admin-comment-area">Admin Comment (Visible to Submitter)</label>
+				<textarea id="admin-comment-area" rows="3" placeholder="Enter your official response/comment."></textarea>
+			</div>
+			<div class="mt-6 flex justify-between gap-4">
+				<button onclick="closeAdminCommentModal()" class="btn btn-secondary">Cancel</button>
+				<button onclick="saveAdminComment('heard')" class="btn btn-primary">✅ Mark as 'Heard'</button>
+				<button onclick="saveAdminComment('resolved')" class="btn btn-success">⭐ Mark as 'Resolved'</button>
+			</div>
+		</div>
+	</div>
 
     <div id="page-data-settings" class="page items-center justify-center p-4">
         <main class="w-full max-w-2xl mx-auto card p-8 md:p-10">
@@ -1404,13 +1524,13 @@
 	const SUPABASE_URL = "https://yalakdknnafztkkxofxs.supabase.co";
 	// CORRECTED: Using the Anon Key (which starts with eyJ)
 	const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhbGFrZGtubmFmenRra3hvZnhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3NTYxNDAsImV4cCI6MjA3NjMzMjE0MH0.bZHzksinNgAN4ePM9uaRaUsmNmeHdEQpntXPBfbXVes";
-	const TABLES = ['students', 'results', 'attendance', 'holidays', 'classes', 'feedback_data', 'user_roles', 'teachers', 'teaching_logs'];
-
-	// ✅ This line fixes the error by defining the constant in the correct scope
-	const USER_DATA_TABLES = ['students', 'results', 'attendance', 'holidays', 'classes', 'feedback_data', 'teachers', 'teaching_logs'];
+	const TABLES = ['students', 'results', 'attendance', 'holidays', 'classes', 'feedback_data', 'user_roles', 'teachers', 'teaching_logs', 'teacher_feedback'];
+	const USER_DATA_TABLES = ['students', 'results', 'attendance', 'holidays', 'classes', 'feedback_data', 'teachers', 'teaching_logs', 'teacher_feedback'];
 
 	const PERMANENT_ADMIN_EMAIL = 'daxingfahad8@gmail.com';
 
+
+    let currentFeedbackId = null; // State for the admin modal
 	// Global App State
 	let supabase, currentUser = null, currentPageId = 'page-1-login';
 	// ... (the rest of your script continues from here)
@@ -1704,13 +1824,18 @@
 		if (pageId === 'page-analytics-dashboard') { initializeAnalyticsDashboard(); }
 		if (pageId === 'page-feedback-system') { initializeFeedbackSystem(); }
 		if (pageId === 'page-student-registration') { initializeStudentRegistration(); }
+        // ... (around line 1517)
+        // ...
 		if (pageId === 'page-organization-management') { orgMgmt_initializePage(); }
 		
-		// 👇 INSERT THIS NEW LINE 👇
-		if (pageId === 'page-student-management') { initializeStudentManagement(); } 
+		// 👇 FIX: INSERT CALL FOR TERM REPORT INITIALIZATION HERE 👇
+		if (pageId === 'page-student-term-report') { termReport_initialize(); } 
+		
+		if (pageId === 'page-student-management') { initializeStudentManagement(); } 
 		// 👆 END OF INSERT 👆
 		
 		if (pageId === 'page-teacher-log-entry' || pageId === 'page-teacher-faculty-management' || pageId === 'page-teacher-dashboard' || pageId === 'modal-log-filter' || pageId === 'modal-assign-hierarchy') {
+        // ...
 			initializeTeacherDashboard();
 		}
 
@@ -1801,6 +1926,595 @@
         }, 500); // A 500ms delay ensures cleanup happens after the print dialog closes
     };
 
+
+	// --- TEACHER FEEDBACK FUNCTIONS ---
+
+	/**
+	 * Submits the anonymous feedback to the database.
+	 */
+	window.submitAnonymousFeedback = async () => {
+		if (!currentUser) return showToast("You must be logged in to submit feedback.", "error");
+
+		const feedbackText = document.getElementById('suggestion-area').value.trim();
+		if (feedbackText.length < 10) return showToast("Feedback must be at least 10 characters.", "error");
+
+		showToast("Submitting feedback anonymously...", 'info');
+
+		const { error } = await supabase.from('teacher_feedback').insert({
+			user_id: currentUser.id,
+			feedback_text: feedbackText,
+			admin_status: 'new' // Always starts as 'new'
+		});
+
+		if (error) {
+			console.error("Feedback submission error:", error);
+			return showToast("Failed to submit feedback.", "error");
+		}
+
+		document.getElementById('suggestion-area').value = '';
+		showToast("✅ Suggestion submitted. Thank you for your input!", "success");
+		// Reload admin panel if on the page
+		if (currentPageId === 'page-teacher-feedback') loadTeacherFeedback(); 
+	};
+
+	/**
+	* Loads and displays the feedback list in the Admin Panel.
+	* Also updates the notification badge.
+	*/
+	// --- REPLACE THE ENTIRE window.loadTeacherFeedback FUNCTION (Starts around line 1707) ---
+	window.loadTeacherFeedback = async () => {
+		const isAdminView = (currentUserRole === 'admin' || currentUserRole === 'editor');
+		const panel = document.getElementById('teacher-feedback-admin-panel');
+		const badge = document.getElementById('feedback-notification-badge');
+		const listContainer = document.getElementById('admin-feedback-list');
+		const dashboardCardSubtitle = document.querySelector('#page-2-main-dashboard button[onclick*="page-teacher-feedback"] p.text-sm');
+
+
+		if (!isAdminView) {
+			panel.classList.add('hidden');
+			badge.classList.add('hidden');
+			if (dashboardCardSubtitle) dashboardCardSubtitle.textContent = "Submit and review anonymous feedback.";
+			return;
+		}
+
+		panel.classList.remove('hidden');
+		listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">Fetching suggestions...</p>';
+
+		// Admin/Editor logic: fetch all feedback
+		const { data: allFeedback, error } = await supabase.from('teacher_feedback')
+			.select('*')
+			.order('submission_date', { ascending: false });
+
+		if (error) {
+			console.error("Error fetching admin feedback:", error);
+			listContainer.innerHTML = '<p class="text-center text-red-500 p-4">Error loading data.</p>';
+			return;
+		}
+		
+		// --- CALCULATE METRICS ---
+		const newCount = allFeedback.filter(f => f.admin_status === 'new').length;
+		const resolvedCount = allFeedback.filter(f => f.admin_status === 'resolved').length;
+		const heardCount = allFeedback.filter(f => f.admin_status === 'heard').length;
+		const totalPending = newCount + heardCount; 
+
+		// Update the dashboard badge and heading
+		badge.textContent = totalPending;
+		badge.classList.toggle('hidden', totalPending === 0);
+		document.getElementById('admin-panel-heading').textContent = `New: ${newCount} | Heard: ${heardCount} | Resolved: ${resolvedCount}`;
+		if (dashboardCardSubtitle) {
+			dashboardCardSubtitle.textContent = `New (${newCount}), Pending (${heardCount}), Resolved (${resolvedCount})`;
+		}
+
+
+		if (allFeedback.length === 0) {
+			listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">No suggestions have been submitted yet.</p>';
+			return;
+		}
+
+		listContainer.innerHTML = allFeedback.map(f => {
+			const statusClass = f.admin_status === 'new' ? 'border-red-500' : (f.admin_status === 'heard' ? 'border-yellow-500' : 'border-green-500');
+			const statusText = f.admin_status.charAt(0).toUpperCase() + f.admin_status.slice(1);
+			const commentPreview = f.admin_comment ? `<p class="text-xs text-gray-400 mt-2">Admin: ${f.admin_comment.substring(0, 50)}...</p>` : '';
+			const date = new Date(f.submission_date).toLocaleDateString('en-GB');
+			
+			// Conditional Delete Button (Only visible if status is 'resolved' AND user is admin/editor)
+			const deleteButton = (f.admin_status === 'resolved' && (currentUserRole === 'admin' || currentUserRole === 'editor')) 
+				? `<button onclick="deleteTeacherFeedback(${f.id}, '${f.admin_status}')" class="btn btn-danger !p-1 text-xs mt-2 ml-2">🗑️ Delete</button>` 
+				: '';
+
+			return `
+				<div class="p-3 border-l-4 ${statusClass} bg-gray-50 rounded-lg">
+					<div class="flex justify-between items-center">
+						<p class="font-bold text-sm text-gray-700">Status: <span class="uppercase text-xs font-extrabold">${statusText}</span></p>
+						<p class="text-xs text-gray-500">${date}</p>
+					</div>
+					<p class="mt-2 text-gray-600 text-sm">${f.feedback_text.substring(0, 100)}...</p>
+					${commentPreview}
+					<button onclick="openAdminCommentModal(${f.id}, '${btoa(f.feedback_text)}', '${btoa(f.admin_comment || '')}')" class="btn btn-secondary !p-1 text-xs mt-2">
+						Review / Comment
+					</button>
+					${deleteButton}
+				</div>
+			`;
+		}).join('');
+	};
+
+	/**
+	 * Opens the modal for the admin/editor to review and comment on feedback.
+	 */
+	window.openAdminCommentModal = (id, encodedFeedback, encodedComment) => {
+		if (currentUserRole !== 'admin' && currentUserRole !== 'editor') return showToast("Access denied.", "error");
+
+		currentFeedbackId = id;
+		const feedbackText = atob(encodedFeedback);
+		const existingComment = atob(encodedComment);
+
+		document.getElementById('modal-feedback-content').textContent = feedbackText;
+		document.getElementById('admin-comment-area').value = existingComment;
+
+		window.navigateTo('modal-admin-comment');
+	};
+
+	/**
+	 * Closes the admin comment modal.
+	 */
+	window.closeAdminCommentModal = () => {
+		currentFeedbackId = null;
+		document.getElementById('admin-comment-area').value = '';
+		window.navigateTo('page-teacher-feedback');
+	};
+
+	/**
+	 * Saves the admin's comment and updates the status.
+	 */
+	window.saveAdminComment = async (newStatus) => {
+		if (!currentFeedbackId) return showToast("Error: No feedback selected.", "error");
+
+		const comment = document.getElementById('admin-comment-area').value.trim();
+		if (!comment) return showToast("Admin comment is required.", "error");
+
+		showToast(`Marking as '${newStatus}' and saving comment...`, 'info');
+
+		const { error } = await supabase.from('teacher_feedback')
+			.update({ 
+				admin_status: newStatus,
+				admin_comment: comment,
+				admin_comment_by: currentUser.id
+			})
+			.eq('id', currentFeedbackId);
+
+		if (error) {
+			console.error("Error saving admin comment:", error);
+			return showToast("Failed to save admin comment.", "error");
+		}
+
+		showToast("Comment saved and status updated!", "success");
+		closeAdminCommentModal();
+		loadTeacherFeedback(); 
+	};
+
+	// --- NEW FUNCTION: Delete Teacher Feedback ---
+	window.deleteTeacherFeedback = async (id, status) => {
+		// 1. Enforce Role & Status Constraint
+		if (currentUserRole !== 'admin' && currentUserRole !== 'editor') {
+			return showToast("Access denied.", "error");
+		}
+		if (status !== 'resolved') {
+			return showToast("🚫 Only 'Resolved' suggestions can be permanently deleted.", "error");
+		}
+
+		if (!confirm("Are you sure you want to permanently delete this RESOLVED suggestion?")) {
+			return;
+		}
+
+		showToast("Deleting resolved suggestion...", 'info');
+
+		// 2. Perform Deletion
+		const { error } = await supabase.from('teacher_feedback').delete().eq('id', id);
+
+		if (error) {
+			console.error("Deletion error:", error);
+			return showToast("Failed to delete suggestion.", "error");
+		}
+
+		showToast("Resolved suggestion deleted.", "success");
+		loadTeacherFeedback(); // Refresh the list
+	};
+
+	// --- Badge Initialization on Load (runs once) ---
+
+	document.addEventListener('DOMContentLoaded', () => {
+		// Check if the current user is an admin/editor and update the badge
+		if (currentUserRole === 'admin' || currentUserRole === 'editor') {
+			const checkBadge = async () => {
+				 const { count: newCount } = await supabase.from('teacher_feedback')
+					.select('id', { count: 'exact', head: true })
+					.eq('admin_status', 'new');
+				
+				const badge = document.getElementById('feedback-notification-badge');
+				if (badge) {
+					badge.textContent = newCount;
+					badge.classList.toggle('hidden', newCount === 0);
+				}
+			};
+			// Initial check and set an interval for live updates
+			checkBadge();
+			setInterval(checkBadge, 60000); // Check every 60 seconds
+		}
+	});
+
+	// Update the navigation handler for the new page
+	// You need to add this to the navigation logic, either by adding a new case 
+	// or ensuring the existing logic handles 'page-teacher-feedback'.
+	// (The navigateTo function in the provided code is already generalized, 
+	// but ensure loadTeacherFeedback() runs when the page is entered)
+
+	const originalNavigateTo = window.navigateTo; // Assuming the provided JS has a window.navigateTo
+	window.navigateTo = (pageId) => {
+		originalNavigateTo(pageId); // Call the original function
+
+		if (pageId === 'page-teacher-feedback') {
+			loadTeacherFeedback();
+		}
+	};
+
+	// --- STUDENT TERM COMPARISON REPORT LOGIC ---
+	let termReportChartOverall = null;
+	let termReportSubjectCharts = {};
+	
+	// --- NEW HELPER: Reads values from the rendered checkbox list ---
+	function getSelectedTermsFromCheckboxes() {
+		return Array.from(
+			document.querySelectorAll('#term-report-term-select input[type="checkbox"]:checked')
+		).map(checkbox => checkbox.value);
+	}
+
+	// --- STUDENT TERM COMPARISON REPORT LOGIC ---
+	window.termReport_initialize = () => {
+		populateClassSelect('term-report-class-select', false);
+		
+		document.getElementById('term-report-stream-select').innerHTML = '<option value="">-- Select Stream --</option>';
+		document.getElementById('term-report-stream-select').disabled = true;
+		document.getElementById('term-report-student-select').innerHTML = '<option value="">-- Select Student --</option>';
+		document.getElementById('term-report-student-select').disabled = true;
+		document.getElementById('term-report-term-select').innerHTML = ''; 
+		document.getElementById('term-report-term-select').setAttribute('disabled', 'true');
+		
+		document.getElementById('term-report-content').classList.add('hidden');
+		document.getElementById('term-report-no-data').classList.remove('hidden');
+	};
+
+	window.termReport_populateStreamSelect = (className) => {
+		const streamSelect = document.getElementById('term-report-stream-select');
+		const studentSelect = document.getElementById('term-report-student-select');
+		const termSelect = document.getElementById('term-report-term-select');
+
+		streamSelect.innerHTML = '<option value="">-- Select Stream/Group --</option>';
+		studentSelect.innerHTML = '<option value="">-- Select Student --</option>';
+		termSelect.innerHTML = '';
+		studentSelect.disabled = true;
+		termSelect.setAttribute('disabled', 'true');
+		
+		if (className && registrationData.classes[className]) {
+			const streams = Object.keys(registrationData.classes[className]);
+			streams.forEach(stream => {
+				const subgroups = Object.keys(registrationData.classes[className][stream].subgroups);
+				subgroups.forEach(group => {
+					 streamSelect.innerHTML += `<option value="${stream}:::${group}">${stream} - ${group}</option>`;
+				});
+			});
+			streamSelect.disabled = false;
+		}
+		window.termReport_populateStudentAndTerm(); 
+	};
+
+	window.termReport_populateStudentAndTerm = async () => {
+		const classSelect = document.getElementById('term-report-class-select').value;
+		const streamGroupSelect = document.getElementById('term-report-stream-select').value;
+		const studentSelect = document.getElementById('term-report-student-select');
+		const termSelect = document.getElementById('term-report-term-select');
+
+		studentSelect.innerHTML = '<option value="" selected disabled>-- Loading Students... --</option>';
+		termSelect.innerHTML = '';
+		studentSelect.disabled = true;
+		termSelect.setAttribute('disabled', 'true');
+		
+		if (!classSelect || !streamGroupSelect) {
+			studentSelect.innerHTML = '<option value="">-- Select Stream/Group First --</option>';
+			return;
+		}
+		
+		const [stream, group] = streamGroupSelect.split(':::');
+		
+		// 1. Fetch Students
+		const { data: students, error: studentError } = await supabase.from('students')
+			.select('name, roll_no')
+			.eq('user_id', currentUser.id)
+			.eq('class_name', classSelect)
+			.eq('class_type', stream)
+			.eq('subgroup', group)
+			.order('name');
+			
+		if (studentError) { return showToast("Error loading students.", "error"); }
+
+		if (students && students.length > 0) {
+			studentSelect.innerHTML = students.map(s => `<option value="${s.roll_no}">${s.name} (R. ${s.roll_no})</option>`).join('');
+			studentSelect.insertAdjacentHTML('afterbegin', '<option value="" selected disabled>-- Select Student --</option>');
+			studentSelect.disabled = false;
+		} else {
+			studentSelect.innerHTML = '<option value="">No Students Found</option>';
+		}
+
+		// 2. Fetch Terms (only for the selected class)
+		const { data: terms, error: termsError } = await supabase.from('results')
+			.select('term')
+			.eq('user_id', currentUser.id)
+			.eq('class_name', classSelect)
+			.order('term'); 
+			
+		if (termsError) { return showToast("Error loading terms.", "error"); }
+
+		const uniqueTerms = [...new Set(terms.map(t => t.term))].sort(); 
+
+		termSelect.innerHTML = ''; // Clear previous content
+		
+		if (uniqueTerms.length > 0) {
+			// --- NEW LOGIC: RENDER AS CHECKBOX ITEMS ---
+			termSelect.innerHTML = uniqueTerms.map(t => `
+				<label class="checkbox-item">
+					<input type="checkbox" value="${t}">
+					<span class="text-sm text-gray-700">${t}</span>
+				</label>
+			`).join('');
+			
+			termSelect.removeAttribute('disabled');
+			termSelect.style.pointerEvents = 'auto';
+		} else {
+			termSelect.innerHTML = '<p class="text-sm text-gray-500 p-2">No results found for comparison.</p>';
+			termSelect.style.pointerEvents = 'none';
+		}
+		
+		document.getElementById('term-report-no-data').classList.remove('hidden');
+		document.getElementById('term-report-content').classList.add('hidden');
+	};
+
+	window.runTermComparisonReport = async () => {
+		const className = document.getElementById('term-report-class-select').value;
+		const rollNo = document.getElementById('term-report-student-select').value;
+		
+		// --- USING THE NEW HELPER FUNCTION ---
+		const selectedTerms = getSelectedTermsFromCheckboxes();
+		
+		const studentDisplay = document.getElementById('term-report-student-select').options[document.getElementById('term-report-student-select').selectedIndex];
+		const studentName = studentDisplay ? studentDisplay.textContent : 'N/A Student';
+
+
+		if (!rollNo || selectedTerms.length < 2) {
+			return showToast("Please select a student and at least two terms for comparison.", "error");
+		}
+
+		showToast(`Fetching results for ${studentName} across ${selectedTerms.length} terms...`, "info");
+		
+		const { data: results, error } = await supabase.from('results')
+			.select('term, marks_data')
+			.eq('user_id', currentUser.id)
+			.eq('class_name', className)
+			.eq('student_roll_no', rollNo)
+			.in('term', selectedTerms);
+
+		if (error || !results || results.length < selectedTerms.length) {
+			 document.getElementById('term-report-content').classList.add('hidden');
+			 document.getElementById('term-report-no-data').classList.remove('hidden');
+			 return showToast(`Could not find results for all selected terms. Found ${results?.length || 0}/${selectedTerms.length}.`, "error");
+		}
+
+		const processedData = processTermReportData(results, selectedTerms);
+
+		document.getElementById('term-report-title').textContent = `Growth Report for ${studentName.split('(')[0].trim()}`;
+		document.getElementById('term-report-no-data').classList.add('hidden');
+		document.getElementById('term-report-content').classList.remove('hidden');
+		
+		renderOverallChart(processedData.overallData, selectedTerms);
+		renderSubjectCharts(processedData.subjectData, selectedTerms);
+		
+		showToast("Report generated successfully!", "success");
+	};
+
+	function processTermReportData(results, termsOrder) {
+		const overallData = {
+			labels: termsOrder,
+			percentages: [],
+			totals: []
+		};
+		const subjectData = {}; 
+
+		const resultsByTerm = new Map(results.map(r => [r.term, r.marks_data]));
+
+		const allSubjects = new Set();
+		results.forEach(r => r.marks_data.forEach(m => allSubjects.add(m.name)));
+		
+		const sortedSubjects = [...allSubjects].sort();
+
+		termsOrder.forEach(term => {
+			const marksData = resultsByTerm.get(term) || [];
+			let totalObtained = 0;
+			let totalPossible = 0;
+			
+			const marksMap = new Map(marksData.map(m => [m.name, m]));
+
+			sortedSubjects.forEach(subjectName => {
+				const mark = marksMap.get(subjectName);
+
+				if (!subjectData[subjectName]) {
+					subjectData[subjectName] = { percentages: [], totals: [] };
+				}
+
+				if (mark) {
+					totalObtained += mark.obtained;
+					totalPossible += mark.total;
+					const percentage = mark.total > 0 ? (mark.obtained / mark.total) * 100 : 0;
+					subjectData[subjectName].percentages.push(percentage.toFixed(1));
+					subjectData[subjectName].totals.push(mark.total);
+				} else {
+					subjectData[subjectName].percentages.push(0); 
+					subjectData[subjectName].totals.push(0);
+				}
+			});
+			
+			const overallPercentage = totalPossible > 0 ? (totalObtained / totalPossible) * 100 : 0;
+			overallData.percentages.push(overallPercentage.toFixed(1));
+			overallData.totals.push(totalPossible);
+		});
+		
+		return { overallData, subjectData: subjectData };
+	}
+
+
+	function renderOverallChart(data, termsOrder) {
+		const ctx = document.getElementById('term-report-overall-chart').getContext('2d');
+		if (termReportChartOverall) termReportChartOverall.destroy();
+
+		const percentages = data.percentages.map(p => parseFloat(p));
+		const expectedGrowth = termsOrder.map((t, i) => (i === 0) ? percentages[i] : (percentages[i - 1] * 1.05).toFixed(1)); 
+		
+		const fallPoints = percentages.map((p, i) => {
+			if (i > 0 && (percentages[i - 1] - p) > 10) {
+				return { x: i, y: p, label: `Sudden Drop (${(percentages[i - 1] - p).toFixed(1)}%)` };
+			}
+			return null;
+		}).filter(Boolean);
+
+
+		termReportChartOverall = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: data.labels,
+				datasets: [
+					{
+						label: 'Actual Performance (%)',
+						data: percentages,
+						borderColor: 'rgb(25, 135, 84)', 
+						backgroundColor: 'rgba(25, 135, 84, 0.2)',
+						borderWidth: 4, 
+						tension: 0.4, 
+						pointRadius: 8,
+						pointBackgroundColor: 'rgb(25, 135, 84)',
+						fill: 'start', 
+						pointHoverRadius: 10
+					},
+					{
+						label: 'Target Growth (Est. +5%)',
+						data: expectedGrowth,
+						borderColor: 'rgb(108, 117, 125, 0.7)', 
+						backgroundColor: 'transparent',
+						borderDash: [8, 4], 
+						pointRadius: 0
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				aspectRatio: 2.5, 
+				scales: { 
+					y: { 
+						beginAtZero: true, 
+						max: 100, 
+						title: { display: true, text: 'Performance Percentage (%)' } 
+					} 
+				},
+				plugins: { 
+					title: { 
+						display: true, 
+						text: 'Overall Performance Comparison',
+						font: { size: 16 }
+					},
+					tooltip: { 
+						mode: 'index', 
+						intersect: false, 
+						callbacks: {
+							 title: (items) => `${items[0].label} Result`,
+							 label: (context) => ` ${context.dataset.label}: ${context.parsed.y}%`
+						}
+					},
+				}
+			}
+		});
+	}
+
+	function renderSubjectCharts(subjectData, termsOrder) {
+		const container = document.getElementById('term-report-subject-charts');
+		container.innerHTML = '';
+		
+		Object.values(termReportSubjectCharts).forEach(chart => {
+			if (chart && typeof chart.destroy === 'function') chart.destroy();
+		});
+		termReportSubjectCharts = {};
+
+		Object.entries(subjectData).forEach(([subject, data]) => {
+			if (data.percentages.every(p => parseFloat(p) === 0)) return; 
+
+			// Create canvas element
+			const canvasId = `subject-chart-${subject.replace(/[^a-zA-Z0-9]/g, '-')}`;
+			const chartHtml = `
+				<div class="chart-card">
+					<h4 class="font-semibold text-base text-gray-700 mb-2">Subject: ${subject}</h4>
+					<canvas id="${canvasId}"></canvas>
+				</div>`;
+			container.insertAdjacentHTML('beforeend', chartHtml);
+
+			const ctx = document.getElementById(canvasId).getContext('2d');
+			const percentages = data.percentages.map(p => parseFloat(p));
+
+			const expectedGrowth = termsOrder.map((t, i) => (i === 0) ? percentages[i] : (percentages[i - 1] * 1.03).toFixed(1)); 
+
+			termReportSubjectCharts[subject] = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: termsOrder,
+					datasets: [
+						{
+							label: 'Actual Subject %',
+							data: percentages,
+							borderColor: 'rgb(220, 53, 69)', 
+							backgroundColor: 'rgba(220, 53, 69, 0.1)',
+							borderWidth: 2,
+							tension: 0.3,
+							pointRadius: 5,
+							pointBackgroundColor: 'rgb(220, 53, 69)',
+							fill: false
+						},
+						 {
+							label: 'Expected Subject Growth',
+							data: expectedGrowth,
+							borderColor: 'rgba(100, 100, 100, 0.5)',
+							backgroundColor: 'transparent',
+							borderDash: [3, 3],
+							pointRadius: 0
+						}
+					]
+				},
+				options: {
+					responsive: true,
+					aspectRatio: 1.5, 
+					scales: { 
+						y: { 
+							beginAtZero: true, 
+							max: 100,
+							title: { display: false }
+						} 
+					},
+					plugins: { 
+						legend: { display: false },
+						tooltip: {
+							 callbacks: {
+								label: (context) => ` Score: ${context.parsed.y}%`
+							 }
+						}
+					}
+				}
+			});
+		});
+	}
 
     /**************************************************************************/
     /* RESULTS APP LOGIC (UPDATED WITH HIERARCHY)                             */
@@ -5026,71 +5740,91 @@ window.addAttendanceToPreview = async () => {
 		`).join('');
     };
 
-    window.applySubmissionFilter = () => {
-        const teacherSelect = document.getElementById('log-teacher-select');
-        const classSelect = document.getElementById('log-class');
-        const subjectSelect = document.getElementById('log-subject');
+	window.filterSubjectDropdown = (teacherName, className) => {
+		const subjectSelect = document.getElementById('log-subject');
+		subjectSelect.innerHTML = '<option value="" selected disabled>-- Select Subject --</option>';
+		subjectSelect.disabled = true;
 
-        const selectedTeacherName = teacherSelect.value;
-        const teacher = facultyListCache.find(t => t.name === selectedTeacherName);
+		if (!teacherName || !className) return;
 
-        // Reset fields to placeholders and disable them
-        classSelect.innerHTML = '<option value="">-- Select Class --</option>';
-        subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
-        classSelect.disabled = true;
-        subjectSelect.disabled = true;
+		const teacher = facultyListCache.find(t => t.name === teacherName);
+		const assignedSubjectsMap = teacher?.assigned_subjects || {};
+		
+		// CRITICAL: Filter the subject list specifically by the selected class key
+		const subjectsForClass = assignedSubjectsMap[className] || [];
 
-        if (!teacher || !teacher.assigned_classes || !teacher.assigned_subjects) {
-            // If no teacher is selected or assignments are missing, just reset and stop.
-            renderWeeklyLogBody();
-            return;
-        }
+		if (subjectsForClass.length > 0) {
+			// Ensure subject dropdown contains only the subjects assigned to the SELECTED class
+			subjectSelect.innerHTML = subjectsForClass.map(s =>
+				`<option value="${s}">${s}</option>`
+			).join('');
+			subjectSelect.insertAdjacentHTML('afterbegin', '<option value="" selected disabled>-- Select Subject --</option>');
+			subjectSelect.disabled = false;
+		}
+	};
 
-        // 1. Populate Classes (Forced Dropdown)
-        const assignedClasses = teacher.assigned_classes || [];
-        if (assignedClasses.length > 0) {
-            classSelect.innerHTML = assignedClasses.map(c =>
-                `<option value="${c}">${c}</option>`
-            ).join('');
-            classSelect.insertAdjacentHTML('afterbegin', '<option value="" selected disabled>-- Select Class --</option>');
-            classSelect.disabled = false;
-        }
+		// (REPLACE THE EXISTING FUNCTION ENTIRELY)
+	window.applySubmissionFilter = () => {
+		const teacherSelect = document.getElementById('log-teacher-select');
+		const classSelect = document.getElementById('log-class');
+		const subjectSelect = document.getElementById('log-subject');
 
-        // 2. Populate Subjects (Forced Dropdown)
-        const assignedSubjects = teacher.assigned_subjects || [];
-        if (assignedSubjects.length > 0) {
-            subjectSelect.innerHTML = assignedSubjects.map(s =>
-                `<option value="${s}">${s}</option>`
-            ).join('');
-            subjectSelect.insertAdjacentHTML('afterbegin', '<option value="" selected disabled>-- Select Subject --</option>');
-            subjectSelect.disabled = false;
-        }
+		const selectedTeacherName = teacherSelect.value;
+		const teacher = facultyListCache.find(t => t.name === selectedTeacherName);
 
-        //showToast(`Assignments loaded for ${selectedTeacherName}.`, 'info'); // Removed redundant toast
+		// Reset fields to placeholders and disable them
+		classSelect.innerHTML = '<option value="">-- Select Class --</option>';
+		subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
+		classSelect.disabled = true;
+		subjectSelect.disabled = true;
 
-        // --- CRITICAL: Attach event listeners to the new dropdowns for auto-loading ---
-        const checkAndLoad = () => {
-            const className = classSelect.value;
-            const subjectName = subjectSelect.value;
+		if (!teacher || !teacher.assigned_classes || !teacher.assigned_subjects) {
+			renderWeeklyLogBody();
+			return;
+		}
 
-            // Only trigger the load if Class and Subject are also selected
-            if (selectedTeacherName && className && subjectName) {
-                loadPreviousWeeklyTopics(selectedTeacherName, className, subjectName);
-            } else {
-                renderWeeklyLogBody(); // Clear topics if selection is incomplete
-            }
-        };
+		// 1. Populate Classes
+		const assignedClasses = teacher.assigned_classes || [];
+		if (assignedClasses.length > 0) {
+			classSelect.innerHTML = assignedClasses.map(c =>
+				`<option value="${c}">${c}</option>`
+			).join('');
+			classSelect.insertAdjacentHTML('afterbegin', '<option value="" selected disabled>-- Select Class --</option>');
+			classSelect.disabled = false;
+		}
 
-        classSelect.onchange = checkAndLoad;
-        subjectSelect.onchange = checkAndLoad;
+		// 2. Define the final action function (checkAndLoad)
+		const checkAndLoad = () => {
+			const className = classSelect.value;
+			const subjectName = subjectSelect.value;
 
-        // Initial load check (if a single teacher is selected and fields auto-populate)
-        if (classSelect.value && subjectSelect.value) {
-            checkAndLoad();
-        } else {
-            renderWeeklyLogBody();
-        }
-    };
+			if (selectedTeacherName && className && className !== '' && subjectName && subjectName !== '') {
+				// If all 3 are selected, attempt to load the log
+				loadPreviousWeeklyTopics(selectedTeacherName, className, subjectName);
+			} else {
+				// Otherwise, just render an empty form
+				renderWeeklyLogBody();
+			}
+		};
+		
+		// 3. CRITICAL FIX: Class selection triggers Subject filter and local reset.
+		classSelect.onchange = () => {
+			const className = classSelect.value;
+			window.filterSubjectDropdown(selectedTeacherName, className);
+			renderWeeklyLogBody(); 
+			// Check if a subject was auto-selected (e.g., if there's only one option)
+			if (subjectSelect.options.length === 2 && subjectSelect.options[1].value !== '') {
+				 subjectSelect.value = subjectSelect.options[1].value; // Auto-select single subject
+				 checkAndLoad();
+			}
+		};
+
+		// 4. Attach the final loader/checker to the subject dropdown
+		subjectSelect.onchange = checkAndLoad;
+
+		// 5. Initial state cleanup
+		renderWeeklyLogBody();
+	};
 
 
     window.saveTeachingLog = async () => {
@@ -5145,54 +5879,51 @@ window.addAttendanceToPreview = async () => {
     };
 
 
-    window.loadPreviousWeeklyTopics = async (teacherName, className, subjectName) => {
-        // 1. Determine the week start date for the current week
-        const weekStartDate = getWeekStartDate();
+	  // (REPLACE THE EXISTING FUNCTION ENTIRELY)
+	window.loadPreviousWeeklyTopics = async (teacherName, className, subjectName) => {
+		// 1. Determine the week start date for the current week
+		const weekStartDate = getWeekStartDate();
 
-        //showToast("Checking for current week's submission...", 'info'); // Removed redundant toast
+		// 2. Query the database using ALL the unique constraints
+		const { data: log, error } = await supabase.from('teaching_logs')
+			.select('weekly_topics')
+			.eq('user_id', currentUser.id)
+			.eq('teacher_name', teacherName)
+			.eq('class_name', className)
+			.eq('subject_name', subjectName)
+			.eq('week_start_date', weekStartDate)
+			.maybeSingle(); 
 
-        // 2. Query the database using ALL the unique constraints
-        // Assuming 'teaching_logs' has a unique constraint on (user_id, teacher_name, class_name, subject_name, week_start_date)
-        const { data: log, error } = await supabase.from('teaching_logs')
-            .select('weekly_topics')
-            .eq('user_id', currentUser.id)
-            .eq('teacher_name', teacherName)
-            .eq('class_name', className)
-            .eq('subject_name', subjectName)
-            .eq('week_start_date', weekStartDate)
-            .maybeSingle(); // Expecting at most one record per week
+		// 3. Reset the input grid first (clears fields before populating them)
+		renderWeeklyLogBody();
 
-        // 3. Reset the input grid first (this creates the 7 editable topic rows)
-        renderWeeklyLogBody();
+		if (error && error.code !== 'PGRST116') { // PGRST116 is 'No rows found' (expected case)
+			console.error("DB Error fetching previous log:", error);
+			showToast("Error retrieving previous data. Check Supabase RLS policies.", "error");
+			return;
+		}
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 is 'No rows found' (expected case)
-            console.error("DB Error fetching previous log:", error);
-            showToast("Error retrieving previous data. Check 'teaching_logs' RLS READ policy.", "error");
-            return;
-        }
+		// 4. Populate fields if a log is found
+		if (log && log.weekly_topics) {
+			const topics = log.weekly_topics;
+			let foundCount = 0;
 
-        // 4. Populate fields if a log is found
-        if (log && log.weekly_topics) {
-            const topics = log.weekly_topics;
-            let foundCount = 0;
+			document.querySelectorAll('#weekly-log-body input').forEach(input => {
+				const day = input.dataset.day;
+				if (topics[day]) {
+					input.value = topics[day];
+					foundCount++;
+				}
+				input.readOnly = false;
+			});
 
-            // Iterate through all inputs in the newly rendered table and fill them
-            document.querySelectorAll('#weekly-log-body input').forEach(input => {
-                const day = input.dataset.day;
-                if (topics[day]) {
-                    input.value = topics[day];
-                    foundCount++;
-                }
-                input.readOnly = false;
-            });
-
-            if (foundCount > 0) {
-                showToast("Previous submission for this week loaded!", "success");
-            }
-        } else {
-             //showToast("No previous submission found for this week. Start fresh.", "info"); // Removed redundant toast
-        }
-    };
+			if (foundCount > 0) {
+				showToast("Previous submission for this week loaded! You may edit it.", "success");
+			}
+		} else {
+			showToast("No previous submission found for this week. Start fresh.", "info");
+		}
+	};
 
 
     // --- FIND AND REPLACE THE ENTIRE 'window.loadAndDisplayTeachingLogs' FUNCTION ---
@@ -5239,70 +5970,75 @@ window.addAttendanceToPreview = async () => {
         }
     };
 
-    window.applyLogViewFilter = (resetSecondary) => {
-        const teacherSelect = document.getElementById('filter-teacher-select');
-        const classSelect = document.getElementById('filter-class-select');
-        const subjectSelect = document.getElementById('filter-subject-select');
-        const weekStartInput = document.getElementById('filter-week-start');
-        const viewButton = document.getElementById('view-logs-button');
+	// (REPLACE THE EXISTING FUNCTION ENTIRELY)
+	window.applyLogViewFilter = (resetSecondary) => {
+		const teacherSelect = document.getElementById('filter-teacher-select');
+		const classSelect = document.getElementById('filter-class-select');
+		const subjectSelect = document.getElementById('filter-subject-select');
+		const weekStartInput = document.getElementById('filter-week-start');
+		const viewButton = document.getElementById('view-logs-button');
 
-        const teacherName = teacherSelect.value;
-        const teacher = facultyListCache.find(t => t.name === teacherName);
+		const teacherName = teacherSelect.value;
+		const className = classSelect.value; // Get selected class name
+		const teacher = facultyListCache.find(t => t.name === teacherName);
 
-        // Only reset if teacher changed or forced reset
-        if (resetSecondary || !teacherName) {
-            classSelect.innerHTML = '<option value="" selected disabled>-- Select Class --</option>';
-            subjectSelect.innerHTML = '<option value="" selected disabled>-- Select Subject --</option>';
-            classSelect.disabled = true;
-            subjectSelect.disabled = true;
-        }
+		// Only reset the Class/Subject lists if the Teacher changed or a full reset is forced
+		if (resetSecondary || !teacherName) {
+			classSelect.innerHTML = '<option value="" selected disabled>-- Select Class --</option>';
+			subjectSelect.innerHTML = '<option value="" selected disabled>-- Select Subject --</option>';
+			classSelect.disabled = true;
+			subjectSelect.disabled = true;
+		}
 
-        if (teacher) {
-            // 1. Populate Classes
-            const assignedClasses = teacher.assigned_classes || [];
-            if (assignedClasses.length > 0) {
-                 // Check if options need repopulating (avoids flicker)
-                 if (classSelect.options.length <= 1 || resetSecondary) {
-                    classSelect.innerHTML = assignedClasses.map(c => `<option value="${c}">${c}</option>`).join('');
-                    classSelect.insertAdjacentHTML('afterbegin', '<option value="" selected disabled>-- Select Class --</option>');
-                 }
-                classSelect.disabled = false;
-            } else {
-                 classSelect.innerHTML = '<option value="">-- No Classes Assigned --</option>';
-                 classSelect.disabled = true;
-            }
+		if (teacher) {
+			// 1. Populate Classes (always update if teacher is selected)
+			const assignedClasses = teacher.assigned_classes || [];
+			if (assignedClasses.length > 0) {
+				// Only update the options if resetSecondary is true or if the dropdown is empty
+				if (classSelect.options.length <= 1 || resetSecondary) {
+					classSelect.innerHTML = assignedClasses.map(c => `<option value="${c}" ${c === className ? 'selected' : ''}>${c}</option>`).join('');
+					classSelect.insertAdjacentHTML('afterbegin', '<option value="" selected disabled>-- Select Class --</option>');
+				}
+				classSelect.disabled = false;
+			} else {
+				classSelect.innerHTML = '<option value="">-- No Classes Assigned --</option>';
+				classSelect.disabled = true;
+			}
 
+			// 2. CRITICAL FIX: Populate Subjects based on the SELECTED CLASS
+			const assignedSubjectsMap = teacher.assigned_subjects || {};
+			const subjectsForSelectedClass = assignedSubjectsMap[className] || [];
+			
+			if (className && subjectsForSelectedClass.length > 0) {
+				// Only update the options if resetSecondary is true or if the dropdown is empty
+				if (subjectSelect.options.length <= 1 || resetSecondary || subjectSelect.value === '') {
+					subjectSelect.innerHTML = subjectsForSelectedClass.map(s => `<option value="${s}">${s}</option>`).join('');
+					subjectSelect.insertAdjacentHTML('afterbegin', '<option value="" selected disabled>-- Select Subject --</option>');
+				}
+				subjectSelect.disabled = false;
+			} else if (className) {
+				subjectSelect.innerHTML = '<option value="" selected disabled>-- No Subjects Assigned --</option>';
+				subjectSelect.disabled = true;
+			} else {
+				// Keep placeholder if no class is selected
+				subjectSelect.innerHTML = '<option value="" selected disabled>-- Select Subject --</option>';
+				subjectSelect.disabled = true;
+			}
+		}
 
-            // 2. Populate Subjects
-            const assignedSubjects = teacher.assigned_subjects || [];
-            if (assignedSubjects.length > 0) {
-                 // Check if options need repopulating
-                 if (subjectSelect.options.length <= 1 || resetSecondary) {
-                    subjectSelect.innerHTML = assignedSubjects.map(s => `<option value="${s}">${s}</option>`).join('');
-                    subjectSelect.insertAdjacentHTML('afterbegin', '<option value="" selected disabled>-- Select Subject --</option>');
-                 }
-                subjectSelect.disabled = false;
-            } else {
-                 subjectSelect.innerHTML = '<option value="">-- No Subjects Assigned --</option>';
-                 subjectSelect.disabled = true;
-            }
+		// 3. Update Week Display
+		const startDate = weekStartInput.value;
+		document.getElementById('filter-week-display').textContent = startDate
+			? `Week selected: ${new Date(startDate).toLocaleDateString()}`
+			: `Week selected: (Date required)`;
 
-        }
-
-        // 3. Update Week Display
-        const startDate = weekStartInput.value;
-        document.getElementById('filter-week-display').textContent = startDate
-            ? `Week selected: ${new Date(startDate).toLocaleDateString()}`
-            : `Week selected: (Date required)`;
-
-        // 4. Enable Button if all necessary fields are selected
-        if (teacherName && classSelect.value && subjectSelect.value && startDate) {
-            viewButton.disabled = false;
-        } else {
-            viewButton.disabled = true;
-        }
-    };
-
+		// 4. Enable Button if all necessary fields are selected
+		if (teacherName && classSelect.value && classSelect.value !== '' && subjectSelect.value && subjectSelect.value !== '' && startDate) {
+			viewButton.disabled = false;
+		} else {
+			viewButton.disabled = true;
+		}
+	};
 
     // --- FIND AND REPLACE THE ENTIRE 'window.queryTeachingLogs' FUNCTION ---
     window.queryTeachingLogs = async () => {
